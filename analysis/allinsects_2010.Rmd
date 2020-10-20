@@ -9,5 +9,49 @@ This project uses open source data from the USGS ScienceBase Catalog. All data c
 
 While analysis was also included in the open source library, all analysis found in this project is entirely unique.
 
+
+
 #Libraries
+```{r}
+
+library(knitr)
+library(httr)
+library(jsonlite)
+
+```
+
+# Setup
+
+```{r}
+#can't figure out how to get this to apply to entire script
+knitr::opts_chunk$set(
+  setwd("C:/Users/eliza/Documents/final-project")
+)
+
+```
+
+#Loaded Data
+```{r}
+
+#Get URL for 'InsectCounts_2016-2017'Waihou Insect Count Data 2016 and 2017'
+
+loadInsects <- httr::GET('https://www.sciencebase.gov/catalog/item/5d2671d9e4b0941bde650819')
+
+contentInsects <- jsonlite::fromJSON(content(loadInsects, "text"), simplifyVector = FALSE)
+
+filesInsect <- contentInsects[19]
+
+urlInsectCounts <- filesInsect[["files"]][[1]][["url"]]
+
+#Load csv
+
+loadInsects1617 <- httr::GET('https://www.sciencebase.gov/catalog/file/get/5d2671d9e4b0941bde650819?f=__disk__17%2F09%2F9f%2F17099f9dfc8e05d1b77e8a75df67ed347f8d1f1f')
+
+contentInsects1617 <- jsonlite::fromJSON(content(loadInsects1617, "text"), simplifyVector = FALSE)
+
+```
+
+```{r}
+
+```
 
