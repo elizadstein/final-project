@@ -1,0 +1,13 @@
+---
+title: "AllInsects_2010 Analysis"
+author: "Eliza Stein"
+date: "10/20/2020"
+output: html_document
+---
+
+This project uses open source data from the USGS ScienceBase Catalog. All data comes from the library "Waihou Mitigation Area, Maui Island, bat acoustic activity, diet and prey availability, 2015 to 2018." Data can be found here: https://www.sciencebase.gov/catalog/item/5cca58b1e4b09b8c0b78009f
+
+While analysis was also included in the open source library, all analysis found in this project is entirely unique.
+
+#Libraries
+
