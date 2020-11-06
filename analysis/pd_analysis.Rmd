@@ -1,0 +1,23 @@
+---
+title: "Prey Delivery Analysis"
+author: "Eliza Stein"
+date: "11/5/2020"
+output: html_document
+---
+
+##Libraries
+```{r}
+
+```
+
+
+
+##Load data
+```{r}
+
+setwd("C:/Users/eliza/Documents/final-project")
+
+pdOriginal <- read.csv("~/final-project/data/pd_master.csv")
+
+```
+
