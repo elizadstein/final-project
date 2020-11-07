@@ -8,6 +8,7 @@ editor_options:
 ---
 
 ##Libraries
+
 ```{r}
 library(tidyverse)
 ```
@@ -22,28 +23,53 @@ pdOriginal <- read.csv("~/final-project/data/pd_main.csv")
 
 #correct class for two time intervals
 as.integer(pdOriginal$'166', pdOriginal$'211')
+
+#rename the first column, which imported with a special character
+names(pdOriginal)[1] <- "nest"
 ```
 
-Rename column names:
-```{r}
-
-
-
-pdRename <- pdOriginal %>% rename_at(vars(oldnames), ~ newnames)
-
-pdRename <- rename(pdOriginal, "0" = "X0.15.min.", "1" = "X16.30.min.", "2" = "X31.45.min.", "3")
-
-```
 
 
 ##Tidy data
 
-First, get each independet PD option into its own row. We will elongate the data by combining columns 
+First, get each time interval into its own row by gathering the data.
 ```{r}
-# To get column numbers
-which(colnames(pdOriginal) == 'X0.15.min.')
 
-# 
+pdGathered <- pdOriginal %>%
+  gather(
+    t0:t526, key = "time_interval",
+    value = num_pd,
+    na.rm = TRUE
+  )
+
+```
+
+Select observations for males only:
+```{r}
+
+pdMales <- pdGathered %>%
+  filter(
+    sex == "M"
+  )
+
+```
+
+Only want observations from Hayman (nest starts with "C") and Missouri (nest starts with "B"). 
+
+First, separate "study_site" from "nest," removing the territory ID and the original column. Then, filter for only Hayman ("C") and Missouri ("B")
+```{r}
+
+pdHayMissou <- pdMales %>%
+  separate(col = nest, into = c("study_site", NA), sep = 1, remove = TRUE) %>%
+  filter(study_site == "B" | study_site == "C")
+
+```
+
+
+```{r}
+
+
+  
 
 ```
 
