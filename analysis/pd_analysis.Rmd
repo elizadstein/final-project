@@ -44,6 +44,28 @@ pdGathered <- pdOriginal %>%
 
 ```
 
+Some values in "num_pd" are blank or contain asterisks. Fix what we can and remove rows with NAs.
+```{r}
+
+#to remove asterisks
+pdClean <- pdGathered %>%
+  mutate(num_pd = gsub("\\*", "", num_pd))
+
+#to make num_pd an integer, setting "" to NA
+pdClean$num_pd <- as.integer(pdClean$num_pd)
+
+#check number of blanks in pdClean vs pdGathered:
+length(which(is.na(pdClean$num_pd))) #4752
+length(which(pdGathered$num_pd=="")) #4750
+#somehow there are 2 more NAs in pdClean after removing asterisks. If anything, pdClean is conservative count.
+
+
+#pdGathered <- na_if(pdGathered$num_pd, "")
+#pdGathered <- replace(pdGathered$num_pd, c("4*", "6*"), c(4, 6))
+
+```
+
+
 Select observations for males only:
 ```{r}
 
@@ -65,10 +87,10 @@ pdHayMissou <- pdMales %>%
 
 ```
 
-
+Quick plot to visualize data:
 ```{r}
 
-
+plot(x = pdHayMissou$time_interval, y = pdHayMissou$num_pd)
   
 
 ```
