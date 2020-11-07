@@ -3,21 +3,47 @@ title: "Prey Delivery Analysis"
 author: "Eliza Stein"
 date: "11/5/2020"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ##Libraries
 ```{r}
-
+library(tidyverse)
 ```
 
 
 
 ##Load data
+
 ```{r}
 
-setwd("C:/Users/eliza/Documents/final-project")
+pdOriginal <- read.csv("~/final-project/data/pd_main.csv")
 
-pdOriginal <- read.csv("~/final-project/data/pd_master.csv")
+#correct class for two time intervals
+as.integer(pdOriginal$'166', pdOriginal$'211')
+```
+
+Rename column names:
+```{r}
+
+
+
+pdRename <- pdOriginal %>% rename_at(vars(oldnames), ~ newnames)
+
+pdRename <- rename(pdOriginal, "0" = "X0.15.min.", "1" = "X16.30.min.", "2" = "X31.45.min.", "3")
+
+```
+
+
+##Tidy data
+
+First, get each independet PD option into its own row. We will elongate the data by combining columns 
+```{r}
+# To get column numbers
+which(colnames(pdOriginal) == 'X0.15.min.')
+
+# 
 
 ```
 
