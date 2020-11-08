@@ -7,6 +7,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+##Start back up after line 62, need to remove rows with NA values
+
 ##Libraries
 
 ```{r}
@@ -32,26 +34,25 @@ names(pdOriginal)[1] <- "nest"
 
 ##Tidy data
 
-First, get each time interval into its own row by gathering the data.
+First, get each time interval into its own row by gathering the data. 
 ```{r}
 
 pdGathered <- pdOriginal %>%
   gather(
     t0:t526, key = "time_interval",
     value = num_pd,
-    na.rm = TRUE
-  )
+    na.rm = TRUE) 
 
 ```
 
-Some values in "num_pd" are blank or contain asterisks. Fix what we can and remove rows with NAs.
+Some values in "num_pd" are blank or contain asterisks. Remove asterisks and convert "num_pd" to integer.
 ```{r}
 
-#to remove asterisks
+#remove asterisks
 pdClean <- pdGathered %>%
   mutate(num_pd = gsub("\\*", "", num_pd))
 
-#to make num_pd an integer, setting "" to NA
+#make num_pd an integer, which converts "" to NA
 pdClean$num_pd <- as.integer(pdClean$num_pd)
 
 #check number of blanks in pdClean vs pdGathered:
@@ -59,38 +60,51 @@ length(which(is.na(pdClean$num_pd))) #4752
 length(which(pdGathered$num_pd=="")) #4750
 #somehow there are 2 more NAs in pdClean after removing asterisks. If anything, pdClean is conservative count.
 
-
-#pdGathered <- na_if(pdGathered$num_pd, "")
-#pdGathered <- replace(pdGathered$num_pd, c("4*", "6*"), c(4, 6))
-
 ```
 
 
-Select observations for males only:
+
+Select observations for males only. Also want to preserve only columns with relevant data.
 ```{r}
 
-pdMales <- pdGathered %>%
-  filter(
-    sex == "M"
-  )
+pdMales <- pdClean %>%
+  filter(sex == "M") %>%
+  select(nest, year, nest_age, sex, time_interval, num_pd)
 
 ```
+
+Remove NAs.
+```{r}
+#check which columns have NA values
+colnames(pdMales)[ apply(pdMales, 2, anyNA) ] #"nest_age" "num_pd"
+
+#remove NA observations. This removes rows where nest_age = NA, which is mostly due to observations of failed nests, and where num_pd = NA, which indicates that nest wasn't observed during that time interval.
+pdNoNA <- na.omit(pdMales)
+
+#some "nest_age" = -1, calculated backwards from estimated fledge date. Correct these values to = 1.
+pdCorrected <- pdNoNA %>%
+  mutate(nest_age = ifelse(nest_age == -1, 1, nest_age))
+```
+
 
 Only want observations from Hayman (nest starts with "C") and Missouri (nest starts with "B"). 
 
 First, separate "study_site" from "nest," removing the territory ID and the original column. Then, filter for only Hayman ("C") and Missouri ("B")
 ```{r}
 
-pdHayMissou <- pdMales %>%
+pdHayMissou <- pdCorrected %>%
   separate(col = nest, into = c("study_site", NA), sep = 1, remove = TRUE) %>%
   filter(study_site == "B" | study_site == "C")
 
 ```
 
-Quick plot to visualize data:
+
+##Plot mean number of prey deliveries for each time interval
+
+
 ```{r}
 
-plot(x = pdHayMissou$time_interval, y = pdHayMissou$num_pd)
+barplot(x = pdHayMissou$time_interval, y = pdHayMissou$num_pd)
   
 
 ```
