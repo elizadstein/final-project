@@ -34,16 +34,23 @@ names(pdOriginal)[1] <- "nest"
 
 ##Tidy data
 
-First, get each time interval into its own row by gathering the data. 
+First, get each time interval into its own row by gathering the data. Also want to remove the "t" in front of each interval number.
 ```{r}
 
 pdGathered <- pdOriginal %>%
   gather(
     t0:t526, key = "time_interval",
     value = num_pd,
-    na.rm = TRUE) 
+    na.rm = TRUE) %>%
+  separate(
+    col = time_interval, into = c(NA, "time"), 
+    sep = 1, remove = TRUE)
+
+#change class of "time" to by numeric
+pdGathered$time <- as.numeric(pdGathered$time)
 
 ```
+
 
 Some values in "num_pd" are blank or contain asterisks. Remove asterisks and convert "num_pd" to integer.
 ```{r}
@@ -69,7 +76,7 @@ Select observations for males only. Also want to preserve only columns with rele
 
 pdMales <- pdClean %>%
   filter(sex == "M") %>%
-  select(nest, year, nest_age, sex, time_interval, num_pd)
+  select(nest, year, nest_age, sex, time, num_pd)
 
 ```
 
@@ -101,11 +108,59 @@ pdHayMissou <- pdCorrected %>%
 
 ##Plot mean number of prey deliveries for each time interval
 
-
+Create variables
 ```{r}
 
-barplot(x = pdHayMissou$time_interval, y = pdHayMissou$num_pd)
+meanHay <- pdHayMissou %>%
+  filter(study_site == "C") %>%
+  group_by(time) %>%
+  summarise(meanPD = mean(num_pd))
+
+
+meanMiss <- pdHayMissou %>%
+  filter(study_site == "B") %>%
+  group_by(time) %>%
+  summarise(meanPD = mean(num_pd))
+
+
+```
+
+Create barplot...this didn't quite work, so not included.
+```{r eval=FALSE, include=FALSE}
+
+plotHay <- barplot(
+  meanHay$meanPD,
+  main = "Mean Prey Deliveries Throughout Night",
+  xlab = "Time Interval",
+  col = "red",
+)
+  legend("topright","Hayman", fill = "red")
+
+#plotMiss <- barplot(meanMiss$meanPD)
   
+
+```
+
+Create geom_col of Hayman and Missouri
+```{r}
+
+colHay <- ggplot(data = meanHay, aes(x = time, y = meanPD, fill = "Hayman")) +
+  geom_col() +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries") +
+  scale_x_continuous(breaks = seq(0, 225, by=15))
+
+
+colMiss <- ggplot(data = meanMiss, aes(x = time, y = meanPD, fill = "Missouri")) +
+  geom_col() +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries") +
+  scale_x_continuous(breaks = seq(0, 300, by=15))
+  
+```
+
+Create combined graph of Hayman and Missouri
+```{r}
+
+
 
 ```
 
