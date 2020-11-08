@@ -114,16 +114,27 @@ Create variables
 meanHay <- pdHayMissou %>%
   filter(study_site == "C") %>%
   group_by(time) %>%
-  summarise(meanPD = mean(num_pd))
+  summarise(meanPD = mean(num_pd)) %>%
+  rename("meanHayman" = "meanPD")
 
 
 meanMiss <- pdHayMissou %>%
   filter(study_site == "B") %>%
   group_by(time) %>%
-  summarise(meanPD = mean(num_pd))
-
+  summarise(meanPD = mean(num_pd)) %>%
+  rename("meanMissouri" = "meanPD") %>%
+#max time of meanHay is 241, whereas max time of meanMiss is 526. We only want to compare what we have data for in both study sites, so I cut out observations in meanMiss when time > 241. Could also keep these values and do a full_join below, filling in missing Hayman observations with NA.
+  filter(time <= 241)
 
 ```
+
+Join variables into one data.frame
+```{r}
+
+meanHayMiss <- left_join(meanHay, meanMiss, by = "time")
+
+```
+
 
 Create barplot...this didn't quite work, so not included.
 ```{r eval=FALSE, include=FALSE}
@@ -160,7 +171,10 @@ colMiss <- ggplot(data = meanMiss, aes(x = time, y = meanPD, fill = "Missouri"))
 Create combined graph of Hayman and Missouri
 ```{r}
 
+#plotTime <- 
 
+ggplot(data = meanHayMiss, aes(x = time, fill = "red")) +
+  geom_col()
 
 ```
 
