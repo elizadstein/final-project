@@ -21,8 +21,6 @@ library(tidyverse)
 
 ```{r}
 
-
-
 pdOriginal <- read.csv("~/final-project/data/pd_main.csv")
 
 
@@ -36,10 +34,10 @@ names(pdOriginal)[1] <- "nest"
 
 ##Tidy data
 
-Filter to only include males in B (Missori) and C (Hayman)
+Filter to only include males in B (Missouri) and C (Hayman)
 ```{r}
 
-pdHayMissou <- pdOriginal %>%
+pdHayMiss <- pdOriginal %>%
   separate(col = nest, into = c("study_site", "territory"), sep = 1, remove = TRUE) %>%
   filter(study_site == "B" | study_site == "C", sex == "M")
 
@@ -48,13 +46,13 @@ pdHayMissou <- pdOriginal %>%
 Check structure of data
 ```{r}
 
-str(pdHayMissou) #columns 't180' and 't225' are character classes
+str(pdHayMiss) #columns 't180' and 't225' are character classes
 
-unique(pdHayMissou$t180) #at least one cell has an asterisk after the value
-unique(pdHayMissou$t225) #same here
+unique(pdHayMiss$t180) #at least one cell has an asterisk after the value
+unique(pdHayMiss$t225) #same here
 
 #remove asterisks
-pdClean <- pdHayMissou %>%
+pdClean <- pdHayMiss %>%
   mutate(t180 = gsub("\\*", "", t180)) %>%
   mutate(t225 = gsub("\\*", "", t225))
 
@@ -62,35 +60,39 @@ pdClean <- pdHayMissou %>%
 pdClean$t180 <- as.integer(pdClean$t180)
 pdClean$t225 <- as.integer(pdClean$t225)
 
+#change column names of time intervals to remove "t"
+colnames(pdClean[12:47]) <- c("15", "30", "45", )
+
 ```
 
-Aggregate by study site mean
+
+Get mean number of prey deliveries for each study site, by time interval
 ```{r}
-#create independet dfs for Hayman and Missouri
+
+#create independet dfs for Hayman and Missouri. 
 pdHay <- filter(pdClean, study_site == "C")
 pdMiss <- filter(pdClean, study_site =="B")
 
-#bind only time observations for each study site
-bindHay <- cbind(study_site = "Hayman", pdHay[12:47])
-bindMiss <- cbind(study_site = "Missouri", pdMiss[12:47])
-
-#take column means of new dfs
-meanHay <- colMeans(bindHay, na.rm = TRUE)
-meanMiss <- colMeans(bindMiss, na.rm = TRUE)
+#make new data frames with column means for each time interval (since the last observation for Hayman is at t240, we'll end both datasets at index number 28)
+meanHay <- data.frame(Hayman = colMeans(pdHay[12:27], na.rm = TRUE))
+meanMiss <- data.frame(Missouri = colMeans(pdMiss[12:27], na.rm = TRUE))
 
 #create new transposed df with means for Hayman and Missouri
 meanHayMiss<- as.matrix(t(cbind(meanHay, meanMiss)))
-
 
 ```
 
 Below is a data.frame of pds for Hayman and Missouri, grouped by "study_site"
 ```{r}
 
+#bind only time observations for each study site
+bindHay <- cbind(study_site = "Hayman", pdHay[12:27])
+bindMiss <- cbind(study_site = "Missouri", pdMiss[12:27])
 
 pdHayMiss <- rbind(bindHay, bindMiss)
 
 ```
+
 
 ##Plot mean prey deliveries
 
