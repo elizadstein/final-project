@@ -7,7 +7,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-##Next step is to create bootstrap CI error bars for plot
+##Next step is to convert times to numeric and then set xlim to 240
 
 ##Libraries
 
@@ -21,155 +21,87 @@ library(tidyverse)
 
 ```{r}
 
+
+
 pdOriginal <- read.csv("~/final-project/data/pd_main.csv")
 
 
 #rename the first column, which imported with a special character
 names(pdOriginal)[1] <- "nest"
+
+
 ```
 
 
 
 ##Tidy data
 
-First, get each time interval into its own row by gathering the data. Also want to remove the "t" in front of each interval number.
+Filter to only include males in B (Missori) and C (Hayman)
 ```{r}
 
-pdGathered <- pdOriginal %>%
-  gather(
-    t15:t540, key = "time_interval",
-    value = num_pd,
-    na.rm = TRUE) %>%
-  separate(
-    col = time_interval, into = c(NA, "time"), 
-    sep = 1, remove = TRUE)
-
-#change class of "time" to by numeric
-pdGathered$time <- as.numeric(pdGathered$time)
+pdHayMissou <- pdOriginal %>%
+  separate(col = nest, into = c("study_site", "territory"), sep = 1, remove = TRUE) %>%
+  filter(study_site == "B" | study_site == "C", sex == "M")
 
 ```
 
-
-Review values in "num_pd"
+Check structure of data
 ```{r}
 
-unique(pdGathered$num_pd) #some values contain an asterisk
+str(pdHayMissou) #columns 't180' and 't225' are character classes
+
+unique(pdHayMissou$t180) #at least one cell has an asterisk after the value
+unique(pdHayMissou$t225) #same here
 
 #remove asterisks
-pdClean <- pdGathered %>%
-  mutate(num_pd = gsub("\\*", "", num_pd))
+pdClean <- pdHayMissou %>%
+  mutate(t180 = gsub("\\*", "", t180)) %>%
+  mutate(t225 = gsub("\\*", "", t225))
 
-#make num_pd an integer, which converts "" to NA
-pdClean$num_pd <- as.integer(pdClean$num_pd)
-
-#check number of NAs in pdClean agains number of blanks in pdGathered:
-length(which(is.na(pdClean$num_pd))) #4750
-length(which(pdGathered$num_pd=="")) #4750
-#they're equal, so we didn't convert anything other than blanks to NA
+#change these columns to integers
+pdClean$t180 <- as.integer(pdClean$t180)
+pdClean$t225 <- as.integer(pdClean$t225)
 
 ```
 
+Aggregate by study site mean
+```{r}
+#create independet dfs for Hayman and Missouri
+pdHay <- filter(pdClean, study_site == "C")
+pdMiss <- filter(pdClean, study_site =="B")
+
+#bind only time observations for each study site
+bindHay <- cbind(study_site = "Hayman", pdHay[12:47])
+bindMiss <- cbind(study_site = "Missouri", pdMiss[12:47])
+
+#take column means of new dfs
+meanHay <- colMeans(bindHay, na.rm = TRUE)
+meanMiss <- colMeans(bindMiss, na.rm = TRUE)
+
+#create new transposed df with means for Hayman and Missouri
+meanHayMiss<- as.matrix(t(cbind(meanHay, meanMiss)))
 
 
-Select observations for males only. Also want to preserve only columns with relevant data.
+```
+
+Below is a data.frame of pds for Hayman and Missouri, grouped by "study_site"
 ```{r}
 
-pdMales <- pdClean %>%
-  filter(sex == "M") %>%
-  select(nest, year, nest_age, sex, time, num_pd)
+
+pdHayMiss <- rbind(bindHay, bindMiss)
 
 ```
 
-Remove NAs.
-```{r}
-#check which columns have NA values
-colnames(pdMales)[ apply(pdMales, 2, anyNA) ] #"nest_age" "num_pd"
+##Plot mean prey deliveries
 
-#remove NA observations. This removes rows where nest_age = NA, which is mostly due to observations of failed nests, and where num_pd = NA, which indicates that a nest wasn't observed during that time interval.
-pdNoNA <- na.omit(pdMales)
-
-#some "nest_age" = -1, calculated backwards from estimated fledge date. This isn't biologically possible, so correct these values to = 1.
-pdCorrected <- pdNoNA %>%
-  mutate(nest_age = ifelse(nest_age == -1, 1, nest_age))
-```
-
-
-Only want observations from Hayman (nest starts with "C") and Missouri (nest starts with "B"). 
-
-First, separate "study_site" from "nest," removing the territory ID and the original column. Then, filter for only Hayman ("C") and Missouri ("B")
 ```{r}
 
-pdHayMissou <- pdCorrected %>%
-  separate(col = nest, into = c("study_site", NA), sep = 1, remove = TRUE) %>%
-  filter(study_site == "B" | study_site == "C")
+meanPlot <- barplot(
+  meanHayMiss, 
+  beside = TRUE, 
+  legend.text = TRUE, 
+  col = c("red", "blue"),
+  ylim = c(0, 3)
+)
 
 ```
-
-
-##Plot mean number of prey deliveries for each time interval
-
-Create variables for three variable data.frame. This isn't used in the final plot, though.
-```{r eval=FALSE, include=FALSE}
-
-meanHay1 <- pdHayMissou %>%
-  filter(study_site == "C") %>%
-  group_by(time) %>%
-  summarise(meanPD = mean(num_pd)) %>%
-  rename("meanHayman" = "meanPD")
-
-#add_column("site" = rep("Hayman", 17)) #this will display in legend when plotting
-
-meanMiss1 <- pdHayMissou %>%
-  filter(study_site == "B") %>%
-  group_by(time) %>%
-  summarise(meanPD = mean(num_pd)) %>%
-  rename("meanMissouri" = "meanPD") %>%
-#max time of meanHay is 241, whereas max time of meanMiss is 526. We only want to compare what we have data for in both study sites, so I cut out observations in meanMiss when time > 241. Could also keep these values and do a full_join below, filling in missing Hayman observations with NA.
-  filter(time <= 241)
-  
-#add_column("site" = rep("Missouri", 17)) #this will display in legend when plotting
-
-#join variables into one data.frame
-meanHayMiss1 <- left_join(meanHay, meanMiss, by = "time")
-
-```
-
-create two variable data.frame
-```{r}
-
-meanHay <- pdHayMissou %>%
-  filter(study_site == "C") %>%
-  group_by(time) %>%
-  summarise(meanPD = mean(num_pd)) %>%
-  filter(time <= 226) %>% #max time of meanHay is 241, but there is only one observation for Hayman at this time, which = 0. Best to just filter observations for Hayman and Missouri to be <= 226
-  add_column("Site" = rep("Hayman", 15)) #this will display in legend when plotting
-
-meanMiss <- pdHayMissou %>%
-  filter(study_site == "B") %>%
-  group_by(time) %>%
-  summarise(meanPD = mean(num_pd)) %>%
-#max time of meanHay is 241, whereas max time of meanMiss is 526. We only want to compare what we have data for in both study sites, so I cut out observations in meanMiss when time > 241. Could also keep these values and do a full_join below, filling in missing Hayman observations with NA.
-  filter(time <= 226) %>%
-  add_column("Site" = rep("Missouri", 15)) #this will display in legend when plotting
-
-#join into one long data.frame
-
-meanHayMiss <- full_join(meanHay, meanMiss)
-
-```
-
-
-
-Create combined graph of Hayman and Missouri
-```{r}
-
-#plotTime <- 
-
-ggplot(data = meanHayMiss, aes(x = time, y = meanPD, fill = Site)) +
-  geom_col(position = "dodge") + #this puts the bars side-by-side instead of stacked
-  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
-       title = "Mean Prey Deliveries in Hayman and Missouri") +
-  scale_x_continuous(breaks = seq(15, 240, by=15)) #sets x-axis scale to increase at 15 minute intervals between 15 and 240
-
-```
-
