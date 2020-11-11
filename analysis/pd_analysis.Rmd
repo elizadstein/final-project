@@ -147,56 +147,38 @@ quantile(new, c(0.25, 0.975))
 
 ```
 
-Now to write function:
 ```{r}
-
-getCI <- function(df, n) {
-  new <- replicate(1000, mean(
-    sample(df[[n]], replace = TRUE), na.rm = TRUE)
-    )
-  sapply(
-    df,
-    new #I try applying 'new' as a function but it makes sense that it doesn't work because it's set to only run on df[[n]]
-  )
+#function to grab CIs from any vector
+getCI <- function(vec, n_samp=10000) {
+  smp <- replicate(n_samp, mean(sample(vec, replace = TRUE), na.rm = TRUE))
+  CIs <-quantile(smp, c(0.025, 0.975), na.rm = T)
+  return(CIs)
 }
 
-getCI(pdHay, 1)
-
-
+#now we apply it across the columns of our PD data
+CI_hay <- apply(pdHay, 2, FUN = getCI)
+CI_miss <- apply(pdMiss, 2, FUN = getCI)
 ```
 
+Adding these to a data frame in long format.
 
-Eventually will append CIs to meanHay and meanMiss:
 ```{r}
-
-longMeanPD <- data.frame(cbind(meanHay, meanMiss), time = seq(15, 240, by = 15))
-longMeanPD
+pd_long <- data.frame(
+  study_area = c(rep("HFSA", nrow(meanHay)), rep("MGSA", nrow(meanMiss))),
+  mean = c(colMeans(pdHay, na.rm = TRUE), colMeans(pdMiss, na.rm = TRUE)),
+  ci_l = c(CI_hay[1,], CI_miss[1,]),
+  ci_h = c(CI_hay[2,], CI_miss[2,]),
+  time = c(as.numeric(colnames(CI_hay)), as.numeric(colnames(CI_miss)))
+  )
 ```
 
-
-Playing with linear models:
+Plot:
 ```{r}
-# linear model for Hayman PDs
-m1 <- lm(longMeanPD$Hayman ~ longMeanPD$time)
-
-plot(y = longMeanPD$Hayman, x = longMeanPD$time)
-abline(m1)
-
-# predict for Hayman PDs
-predict(m1, longMeanPD, interval = 'confidence')
-preds1 <- as.data.frame(predict(m1, longMeanPD, interval = 'confidence'))
-
-# plot prediction model for Hayman
-plot(y = longMeanPD$Hayman, x = longMeanPD$time, pch = 16)
-points(y = preds1$fit, x = longMeanPD$time, pch = 16, col = 'red')
-segments(y0 = preds1$lwr, y1 = preds1$upr, x0 = longMeanPD$time, col = 'red')
-
-
-# below is start to Missouri
-m2 <- lm(longMeanPD$Missouri ~ longMeanPD$time)
-
-plot(y = longMeanPD$Missouri, x = longMeanPD$time)
-abline(m2)
-
+ggplot(pd_long) +
+  geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
+                    group = study_area),
+                position = position_dodge(width=0.75)) +
+  theme_minimal()
 ```
-
