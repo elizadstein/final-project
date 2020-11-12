@@ -20,7 +20,7 @@ library(tidyverse)
 
 ```{r}
 
-pdOriginal <- read.csv("~/final-project/data/pd_main.csv")
+pdOriginal <- read.csv("./data/pd_main.csv")
 
 
 #rename the first column, which imported with a special character
