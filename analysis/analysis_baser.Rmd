@@ -1,0 +1,184 @@
+---
+title: "Prey Delivery Analysis"
+author: "Eliza Stein"
+date: "11/8/2020"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+# Libraries
+
+```{r}
+library(tidyverse)
+```
+
+
+
+# Load data
+
+```{r}
+
+pdOriginal <- read.csv("./data/pd_main.csv")
+
+
+#rename the first column, which imported with a special character
+names(pdOriginal)[1] <- "nest"
+
+
+```
+
+
+
+# Tidy data
+
+Filter to only include males in B (Missouri) and C (Hayman)
+
+```{r}
+
+pdHayMiss <- pdOriginal %>%
+  separate(col = nest, into = c("study_site", "territory"), sep = 1, remove = TRUE) %>%
+  filter(study_site == "B" | study_site == "C", sex == "M")
+
+```
+
+
+Check structure of data
+
+```{r}
+
+str(pdHayMiss) #columns 't180' and 't225' are character classes
+
+unique(pdHayMiss$t180) #at least one cell has an asterisk after the value
+unique(pdHayMiss$t225) #same here
+
+#remove asterisks
+pdClean <- pdHayMiss %>%
+  mutate(t180 = gsub("\\*", "", t180)) %>%
+  mutate(t225 = gsub("\\*", "", t225))
+
+#change these columns to integers
+pdClean$t180 <- as.integer(pdClean$t180)
+pdClean$t225 <- as.integer(pdClean$t225)
+
+
+```
+
+
+Get mean number of prey deliveries for each study site, by time interval
+
+```{r}
+
+#create independet dfs for Hayman and Missouri. (since the last observation for Hayman is at t240, we'll end both datasets there)
+pdHay <- pdClean %>%
+  filter(study_site == "C") %>%
+  select(t15:t240)
+pdMiss <- pdClean %>%
+  filter(study_site =="B") %>%
+  select(t15:t240)
+
+#change column names to remove "t" in front of time interval
+colnames(pdHay) <- c("15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240")
+colnames(pdMiss) <- c("15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240")
+
+#make new data frames with column means for each time interval 
+meanHay <- data.frame(Hayman = colMeans(pdHay, na.rm = TRUE))
+meanMiss <- data.frame(Missouri = colMeans(pdMiss, na.rm = TRUE))
+
+
+
+#create new transposed df with means for Hayman and Missouri
+wideMeanPD <- as.matrix(t(cbind(meanHay, meanMiss)))
+wideMeanPD
+
+```
+
+
+
+
+Below is a data.frame of pds for Hayman and Missouri, which can be grouped by "study_site"
+
+```{r}
+
+#bind only time observations for each study site
+bindHay <- cbind(study_site = "Hayman", pdHay)
+bindMiss <- cbind(study_site = "Missouri", pdMiss)
+
+pdHayMiss <- rbind(bindHay, bindMiss)
+
+```
+
+
+
+# Plot mean prey deliveries
+
+Barplot:
+
+```{r}
+
+meanPlot <- barplot(
+  wideMeanPD, 
+  beside = TRUE, 
+  legend.text = TRUE, 
+  col = c("red", "blue"),
+  ylim = c(0, 3),
+  xlab = "Time After Sunset (minutes)",
+  ylab = "Mean Prey Deliveries",
+  main = "Mean Prey Deliveries Throughout Night"
+)
+
+```
+
+
+# Calculate confidence intervals
+
+
+Here's a start...
+
+This seems to execute successfull for the pdHay$'15'
+```{r}
+#replicate mean of sampling 1000 times
+vec <- pdHay[[1]]
+new <- replicate(10000, mean(sample(vec, replace = TRUE), na.rm = TRUE))
+
+#finds CI of 'new'
+quantile(new, c(0.25, 0.975))
+
+```
+
+```{r}
+#function to grab CIs from any vector
+getCI <- function(vec, n_samp=10000) {
+  smp <- replicate(n_samp, mean(sample(vec, replace = TRUE), na.rm = TRUE))
+  CIs <-quantile(smp, c(0.025, 0.975), na.rm = T)
+  return(CIs)
+}
+
+#now we apply it across the columns of our PD data
+CI_hay <- apply(pdHay, 2, FUN = getCI)
+CI_miss <- apply(pdMiss, 2, FUN = getCI)
+```
+
+Adding these to a data frame in long format.
+
+```{r}
+pd_long <- data.frame(
+  study_area = c(rep("HFSA", nrow(meanHay)), rep("MGSA", nrow(meanMiss))),
+  mean = c(colMeans(pdHay, na.rm = TRUE), colMeans(pdMiss, na.rm = TRUE)),
+  ci_l = c(CI_hay[1,], CI_miss[1,]),
+  ci_h = c(CI_hay[2,], CI_miss[2,]),
+  time = c(as.numeric(colnames(CI_hay)), as.numeric(colnames(CI_miss)))
+  )
+```
+
+Plot:
+```{r}
+ggplot(pd_long) +
+  geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
+                    group = study_area),
+                position = position_dodge(width=0.75)) +
+  theme_minimal()
+```
