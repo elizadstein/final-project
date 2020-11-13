@@ -245,16 +245,20 @@ ciInc <- data.frame(
     mean = c(colMeans(pdHFSA_inc, na.rm = TRUE), colMeans(pdMGSA_inc, na.rm = TRUE)),
     ci_l = c(ciHFSA_inc[1,], ciMGSA_inc[1,]),
     ci_h = c(ciHFSA_inc[2,], ciMGSA_inc[2,]),
-    time = c(as.numeric(rownames(meanHFSA_inc)), as.numeric(rownames(meanMGSA_inc))))
+    time = c(as.numeric(rownames(meanHFSA_inc)), as.numeric(rownames(meanMGSA_inc))),
+    stage = "Incubation")
 
 ciNest <- data.frame(
     study_area = c(rep("HFSA", nrow(meanHFSA_nest)), rep("MGSA", nrow(meanMGSA_nest))),
     mean = c(colMeans(pdHFSA_nest, na.rm = TRUE), colMeans(pdMGSA_nest, na.rm = TRUE)),
     ci_l = c(ciHFSA_nest[1,], ciMGSA_nest[1,]),
     ci_h = c(ciHFSA_nest[2,], ciMGSA_nest[2,]),
-    time = c(as.numeric(rownames(meanHFSA_nest)), as.numeric(rownames(meanMGSA_nest))))
+    time = c(as.numeric(rownames(meanHFSA_nest)), as.numeric(rownames(meanMGSA_nest))),
+    stage = "Nestling")
     
+ciAll <- rbind(ciInc, ciNest)
 
+#need to remove rows after time - 180 from MGSA incubation
 ```
 
 might not need this anymore:
@@ -272,7 +276,7 @@ ciInc <- data.frame(
 Plot:
 ```{r}
 
-ggplot(data = ciInc) +
+plotInc <- ggplot(data = ciInc) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -286,7 +290,7 @@ ggplot(data = ciInc) +
 
 ```{r}
 
-ggplot(data = ciNest) +
+plotNest <- ggplot(data = ciNest) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -296,6 +300,20 @@ ggplot(data = ciNest) +
        title = "Nestling", color = "Study Area") +
   theme_minimal()
 
+```
+
+```{r}
+
+ggplot(data = ciAll) +
+  geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
+                    group = study_area),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Nestling", color = "Study Area") +
+  theme_minimal() +
+  facet_wrap(~ stage)
 
 ```
 
