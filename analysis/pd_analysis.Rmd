@@ -291,7 +291,7 @@ ggplot(data = ciAll) +
 
 ## Prey Deliveries by Year
 
-Going to create a similar graph but with years on the x-axis. I will sum values from time = 15 through time = 60 and only use this data from the first hour of each night.d
+Going to create a similar graph but with years on the x-axis. I will sum values from time = 15 through time = 60 and only use this data from the first hour of each night.
 
 ```{r}
 
