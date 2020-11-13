@@ -156,10 +156,35 @@ meanMGSA_inc <- data.frame(
   time = as.numeric(colnames(pdMGSA_inc)),
   MGSA_incubation = colMeans(pdMGSA_inc, na.rm = TRUE))
 
-meanHFSA_nest <- data.frame(
+meanMGSA_nest <- data.frame(
   time = as.numeric(colnames(pdMGSA_nest)),
   MGSA_nestling = colMeans(pdMGSA_nest, na.rm = TRUE))
+
 ```
+
+
+Two tables, one for nestling stage and one for incubation stage:
+
+```{r}
+
+#filtered this one to end at time = 180, because no observations exist for MGSA after that point
+meanInc <- filter(
+  data.frame(
+    time = as.numeric(colnames(pdHFSA_inc)),
+    HGSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE),
+    MGSA_incubation = colMeans(pdMGSA_inc, na.rm = TRUE)),
+  time <= 180
+)
+
+meanNest <-
+  data.frame(
+  time = as.numeric(colnames(pdHFSA_nest)),
+  HGSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE),
+  MGSA_nestling = colMeans(pdMGSA_nest, na.rm = TRUE)
+)
+
+```
+
 
 One table showing mean PDs for all study sites and stages:
 ```{r}
@@ -176,7 +201,7 @@ meanAll <- data.frame(
 
 
 Combined data.frame for HFSA and MGSA:
-
+remove?
 ```{r}
 
 meanPD2 <- data.frame(
@@ -184,19 +209,6 @@ meanPD2 <- data.frame(
   mean = c(colMeans(pdHFSA, na.rm = TRUE), colMeans(pdMGSA, na.rm = TRUE)),
   time = c(as.numeric(rownames(meanHFSA)), as.numeric(rownames(meanHFSA)))
   )
-
-# loser: get mean for each study site by time and nest stage, filter out rows >225 bc HGSA has no more values
-meanPD1 <- pdStage1 %>%
-  group_by(time, study_site, stage) %>%
-  summarise(mean = mean(num_pds, na.rm = TRUE)) %>%
-  filter(time <= 225)
-
-
-
-meanPD <- data.frame(
-  study_area = 
-)
-
 ```
 
 
@@ -214,11 +226,13 @@ getCI <- function(vec, n_samp=10000) {
 }
 
 #spread meanPD to apply function
-pdSpread <- spread(pdStage, key = "time", value = "num_pds")
+#pdSpread <- spread(pdStage, key = "time", value = "num_pds")
 
 #now apply it across the columns of PD data
-ciHFSA <- apply(pdSpread$'15':pdSpread$'225', 2, FUN = getCI)
-ciMGSA <- apply(pdSpread, 2, FUN = getCI)
+ciHFSA_inc <- apply(pdHFSA_inc, 2, FUN = getCI)
+ciHFSA_nest <- apply(pdHFSA_nest, 2, FUN = getCI)
+ciMGSA_inc <- apply(pdMGSA_inc, 2, FUN = getCI)
+ciMGSA_nest <- apply(pdMGSA_nest, 2, FUN = getCI)
 ```
 
 
@@ -226,7 +240,26 @@ Add these to a data frame.
 
 ```{r}
 
-ciMeanPD <- data.frame(
+ciInc <- data.frame(
+    study_area = c(rep("HFSA", nrow(meanHFSA_inc)), rep("MGSA", nrow(meanMGSA_inc))),
+    mean = c(colMeans(pdHFSA_inc, na.rm = TRUE), colMeans(pdMGSA_inc, na.rm = TRUE)),
+    ci_l = c(ciHFSA_inc[1,], ciMGSA_inc[1,]),
+    ci_h = c(ciHFSA_inc[2,], ciMGSA_inc[2,]),
+    time = c(as.numeric(rownames(meanHFSA_inc)), as.numeric(rownames(meanMGSA_inc))))
+
+ciNest <- data.frame(
+    study_area = c(rep("HFSA", nrow(meanHFSA_nest)), rep("MGSA", nrow(meanMGSA_nest))),
+    mean = c(colMeans(pdHFSA_nest, na.rm = TRUE), colMeans(pdMGSA_nest, na.rm = TRUE)),
+    ci_l = c(ciHFSA_nest[1,], ciMGSA_nest[1,]),
+    ci_h = c(ciHFSA_nest[2,], ciMGSA_nest[2,]),
+    time = c(as.numeric(rownames(meanHFSA_nest)), as.numeric(rownames(meanMGSA_nest))))
+    
+
+```
+
+might not need this anymore:
+```{r}
+ciInc <- data.frame(
   study_area = c(rep("HFSA", nrow(meanHFSA)), rep("MGSA", nrow(meanMGSA))),
   mean = c(colMeans(pdHFSA, na.rm = TRUE), colMeans(pdMGSA, na.rm = TRUE)),
   ci_l = c(ciHFSA[1,], ciMGSA[1,]),
@@ -239,14 +272,30 @@ ciMeanPD <- data.frame(
 Plot:
 ```{r}
 
-ggplot(data = ciMeanPD) +
+ggplot(data = ciInc) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
                     group = study_area),
                 position = position_dodge(width=0.75)) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
-       title = "Mean Prey Deliveries in HFSA and MGSA", color = "Study Area") +
+       title = "Incubation", color = "Study Area") +
   theme_minimal()
 
 ```
+
+```{r}
+
+ggplot(data = ciNest) +
+  geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
+                    group = study_area),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Nestling", color = "Study Area") +
+  theme_minimal()
+
+
+```
+
