@@ -23,7 +23,7 @@ library(tidyverse)
 
 ```{r}
 
-setwd("C:/Users/eliza/Documents/final-project")
+#setwd("C:/Users/eliza/Documents/final-project")
 pdOriginal <- read.csv("./data/pd_main.csv")
 
 
@@ -39,7 +39,7 @@ names(pdOriginal)[1] <- "nest"
 ## Clean up data
 
 
-Filter to only include males in B (Missouri) and C (Hayman)
+Filter to only include males in B (MGSA) and C (HFSA).
 
 ```{r}
 
@@ -50,15 +50,15 @@ pdHM <- pdOriginal %>%
 ```
 
 
-Check structure of data
+Check structure of data.
 
-```{r}
+```{r, structure}
 
-str(pdHM) #columns 't180' and 't225' are character classes, "nest_age" is character class
+#str(pdHM) #columns 't180' and 't225' are character classes, "nest_age" is character class
 
-unique(pdHM$t180) #at least one cell has an asterisk after the value
-unique(pdHM$t225) #same here
-unique(pdHM$nest_age) #"pred" and "" can be converted to NA
+#unique(pdHM$t180) #at least one cell has an asterisk after the value
+#unique(pdHM$t225) #same here
+#unique(pdHM$nest_age) #"pred" and "" can be converted to NA
 
 #remove asterisks
 pdClean <- pdHM %>%
@@ -69,19 +69,7 @@ pdClean <- pdHM %>%
 #change these columns to numeric
 pdClean$t180 <- as.integer(pdClean$t180)
 pdClean$t225 <- as.integer(pdClean$t225)
-pdClean$nest_age <- as.integer(pdClean$nest_age)
-
-
-#gather times into long form
-pdGathered <- pdClean %>%
-  gather(t15:t540, key = "time", value = "num_pds") %>%
-   separate(
-    col = time, into = c(NA, "time"), 
-    sep = 1, remove = TRUE)
-
-
-#make "time" numeric
-pdGathered$time <- as.numeric(pdGathered$time)
+pdClean$nest_age <- as.integer(pdClean$nest_age) #warning here is ok--NAs are replacing "pred" and "" values
 
 
 ```
@@ -96,7 +84,7 @@ since the last observation for HFSA is at time = 240, we'll end both datasets th
 
 First, create data frame with PDs for whole dataset, then broken down by each study site and stage.
 
-```{r}
+```{r, pd_indiv}
 
 #create independet dfs for HFSA (nestling and incubation stage) and MGSA (nestling and incubation state). 
 
@@ -131,7 +119,6 @@ pdMGSA_nest <- pdStage %>%
   select('15':'240')
 
 
-
 ```
 
 
@@ -162,9 +149,9 @@ meanMGSA_nest <- data.frame(
 ```
 
 
-Two tables, one for nestling stage and one for incubation stage:
+Two tables, one for nestling stage and one for incubation stage. This is just for visualization, not used in further analysis.
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 #filtered this one to end at time = 180, because no observations exist for MGSA after that point
 meanInc <- filter(
@@ -199,21 +186,10 @@ meanAll <- data.frame(
 
 
 
-Combined data.frame for HFSA and MGSA:
-remove?
-```{r}
-
-meanPD2 <- data.frame(
-  study_area = c(rep("HFSA", nrow(meanHFSA)), rep("MGSA", nrow(meanMGSA))),
-  mean = c(colMeans(pdHFSA, na.rm = TRUE), colMeans(pdMGSA, na.rm = TRUE)),
-  time = c(as.numeric(rownames(meanHFSA)), as.numeric(rownames(meanHFSA)))
-  )
-```
-
-
 
 ## Calculate confidence intervals
 
+Write and apply function to obtain CIs.
 
 ```{r}
 
@@ -224,9 +200,6 @@ getCI <- function(vec, n_samp=10000) {
   return(CIs)
 }
 
-#spread meanPD to apply function
-#pdSpread <- spread(pdStage, key = "time", value = "num_pds")
-
 #now apply it across the columns of PD data
 ciHFSA_inc <- apply(pdHFSA_inc, 2, FUN = getCI)
 ciHFSA_nest <- apply(pdHFSA_nest, 2, FUN = getCI)
@@ -235,7 +208,7 @@ ciMGSA_nest <- apply(pdMGSA_nest, 2, FUN = getCI)
 ```
 
 
-Add these to a data frame. Remove rows where time > 180 for ciInc because no data is available for MGSA after this time.
+Add CIs to a data frame. Remove rows where time > 180 for ciInc because no data is available for MGSA after this time.
 
 ```{r}
 
@@ -262,19 +235,9 @@ ciAll <- rbind(ciInc, ciNest)
 
 ```
 
-might not need this anymore:
-```{r}
-ciInc <- data.frame(
-  study_area = c(rep("HFSA", nrow(meanHFSA)), rep("MGSA", nrow(meanMGSA))),
-  mean = c(colMeans(pdHFSA, na.rm = TRUE), colMeans(pdMGSA, na.rm = TRUE)),
-  ci_l = c(ciHFSA[1,], ciMGSA[1,]),
-  ci_h = c(ciHFSA[2,], ciMGSA[2,]),
-  time = c(as.numeric(rownames(meanHFSA)), as.numeric(rownames(meanHFSA)))
-  )
 
-```
 
-# Plot:
+## Plot
 
 Incubation:
 ```{r}
@@ -320,6 +283,18 @@ ggplot(data = ciAll) +
        title = "Average Prey Deliveries Throughout Night", color = "Study Area") +
   theme_minimal() +
   facet_grid(stage ~ .)
+
+```
+
+
+
+
+## Prey Deliveries by Year
+
+Going to create a similar graph but with years on the x-axis. I will sum values from time = 15 through time = 60 and only use this data from the first hour of each night.
+
+```{r}
+
 
 ```
 
