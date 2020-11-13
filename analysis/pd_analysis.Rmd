@@ -55,40 +55,70 @@ Check structure of data
 
 ```{r}
 
-str(pdHM) #columns 't180' and 't225' are character classes
+str(pdHM) #columns 't180' and 't225' are character classes, "nest_age" is character class
 
 unique(pdHM$t180) #at least one cell has an asterisk after the value
 unique(pdHM$t225) #same here
+unique(pdHM$nest_age) #"pred" and "" can be converted to NA
 
 #remove asterisks
 pdClean <- pdHM %>%
   mutate(t180 = gsub("\\*", "", t180)) %>%
   mutate(t225 = gsub("\\*", "", t225))
 
+
 #change these columns to numeric
 pdClean$t180 <- as.integer(pdClean$t180)
 pdClean$t225 <- as.integer(pdClean$t225)
+pdClean$nest_age <- as.integer(pdClean$nest_age)
+
+
+#gather times into long form
+pdGathered <- pdClean %>%
+  gather(t15:t540, key = "time", value = "num_pds") %>%
+   separate(
+    col = time, into = c(NA, "time"), 
+    sep = 1, remove = TRUE)
+
+
+#make "time" numeric
+pdGathered$time <- as.numeric(pdGathered$time)
 
 
 ```
 
 
 
-# Prey Deliveryies Throughout Night
+# Prey Deliveries Throughout Night
 
-Data was separated by study site and by incubation vs. nestling stage. Nestling period is defined as nest_age >= 22 days. If nest age was not indicated in original dataset, ES went back into field notes to determine whether nest was in incubation (all eggs) or nestling (at least one hatching) stage. For these records, ES manually input nest_age = 0 for incubation or nest_age = 100 for nestling, so that this data could be easily separated from known nest age.
+Data was separated by study site (HFSA vs. MGSA) and by incubation vs. nestling stage. Nestling period is defined as nest_age >= 22 days. If nest age was not indicated in original dataset, field notes were used to determine whether nest was in incubation (all eggs) or nestling (at least one nestling) stage. For these records, the following values were manually input: nest_age = 0 for incubation or nest_age = 100 for nestling, so that this data could be easily separated from known nest age.  If it was later determined that nest had been predated before observation, "pred" was entered. If the nest stage could not be determined, it was left blank."pred" and "" values were converted to NA earlier when this column was converted to numeric.
 
-Get mean number of prey deliveries for each study site, by time interval
+Get mean number of prey deliveries for each study site, by time interval:
 
 ```{r}
 
 #create independet dfs for HFSA (nestling and incubation stage) and MGSA (nestling and incubation state). (since the last observation for Hayman is at t240, we'll end both datasets there)
 pdIncH <- pdClean %>%
-  filter(study_site == "C", ) %>%
-  select(t15:t240)
+  filter(study_site == "C", nest_age < 22) %>%
+  select(study_site, nest_age, t15:t240)
 
-pdNestH <- 
 
+pdNestH <- pdClean %>%
+  filter(study_site == "C", nest_age >= 22) %>%
+  select(study_site, nest_age, t15:t240)
+
+#winner: select relavent columns, add column for stage, rename study sites, drop NAs
+pdStage <- pdGathered %>%
+  select(study_site, nest_age, time, num_pds) %>%
+  mutate(
+    stage =
+      ifelse(nest_age < 22, "incubation", "nestling"),
+    study_site =
+      ifelse(study_site == "B", "MGSA", "HFSA")) %>%
+  drop_na(num_pds, stage)
+  
+      
+mutate(t180 = gsub("\\*", "", t180))
 
 pdMGSA <- pdClean %>%
   filter(study_site =="B") %>%
@@ -106,6 +136,7 @@ colnames(pdMGSA) <- c("15", "30", "45", "60", "75", "90", "105", "120", "135", "
 
 Two stand-alone data.frames, one for HFSA and one for MGSA:
 
+#Maybe take this out:
 ```{r}
 
 meanHFSA <- data.frame(HGSA = colMeans(pdHFSA, na.rm = TRUE))
@@ -127,6 +158,14 @@ meanPD <- data.frame(
   time = c(as.numeric(rownames(meanHFSA)), as.numeric(rownames(meanHFSA)))
   )
 
+# winner: get mean for each study site by time and nest stage, filter out rows >225 bc HGSA has no more values
+meanPD <- pdStage %>%
+  group_by(time, study_site, stage) %>%
+  summarise(mean = mean(num_pds, na.rm = TRUE)) %>%
+  filter(time <= 225)
+
+  
+
 ```
 
 
@@ -143,9 +182,12 @@ getCI <- function(vec, n_samp=10000) {
   return(CIs)
 }
 
+#spread meanPD to apply function
+pdSpread <- spread(pdStage, key = "time", value = "num_pds")
+
 #now apply it across the columns of PD data
-ciHFSA <- apply(pdHFSA, 2, FUN = getCI)
-ciMGSA <- apply(pdMGSA, 2, FUN = getCI)
+ciHFSA <- apply(pdSpread$'15':pdSpread$'225', 2, FUN = getCI)
+ciMGSA <- apply(pdSpread, 2, FUN = getCI)
 ```
 
 
