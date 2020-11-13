@@ -6,8 +6,7 @@ output: pdf_document
 editor_options: 
   chunk_output_type: console
 ---
-break down by nestling/incubation
-for Hayman nestling and incubation: dot and whisker plot, if pd changes over years
+
 
 # Libraries
 
@@ -236,17 +235,20 @@ ciMGSA_nest <- apply(pdMGSA_nest, 2, FUN = getCI)
 ```
 
 
-Add these to a data frame.
+Add these to a data frame. Remove rows where time > 180 for ciInc because no data is available for MGSA after this time.
 
 ```{r}
 
-ciInc <- data.frame(
+ciInc <- filter(
+  data.frame(
     study_area = c(rep("HFSA", nrow(meanHFSA_inc)), rep("MGSA", nrow(meanMGSA_inc))),
     mean = c(colMeans(pdHFSA_inc, na.rm = TRUE), colMeans(pdMGSA_inc, na.rm = TRUE)),
     ci_l = c(ciHFSA_inc[1,], ciMGSA_inc[1,]),
     ci_h = c(ciHFSA_inc[2,], ciMGSA_inc[2,]),
     time = c(as.numeric(rownames(meanHFSA_inc)), as.numeric(rownames(meanMGSA_inc))),
-    stage = "Incubation")
+    stage = "Incubation"),
+  time <= 180)
+
 
 ciNest <- data.frame(
     study_area = c(rep("HFSA", nrow(meanHFSA_nest)), rep("MGSA", nrow(meanMGSA_nest))),
@@ -258,7 +260,6 @@ ciNest <- data.frame(
     
 ciAll <- rbind(ciInc, ciNest)
 
-#need to remove rows after time - 180 from MGSA incubation
 ```
 
 might not need this anymore:
@@ -273,7 +274,9 @@ ciInc <- data.frame(
 
 ```
 
-Plot:
+# Plot:
+
+Incubation:
 ```{r}
 
 plotInc <- ggplot(data = ciInc) +
@@ -288,6 +291,8 @@ plotInc <- ggplot(data = ciInc) +
 
 ```
 
+
+Nestling:
 ```{r}
 
 plotNest <- ggplot(data = ciNest) +
@@ -302,6 +307,7 @@ plotNest <- ggplot(data = ciNest) +
 
 ```
 
+Both:
 ```{r}
 
 ggplot(data = ciAll) +
@@ -311,9 +317,9 @@ ggplot(data = ciAll) +
                     group = study_area),
                 position = position_dodge(width=0.75)) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
-       title = "Nestling", color = "Study Area") +
+       title = "Average Prey Deliveries Throughout Night", color = "Study Area") +
   theme_minimal() +
-  facet_wrap(~ stage)
+  facet_grid(stage ~ .)
 
 ```
 
