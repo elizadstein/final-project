@@ -36,7 +36,9 @@ names(pdOriginal)[1] <- "nest"
 
 
 
-# Tidy data
+
+## Clean up data
+
 
 Filter to only include males in B (Missouri) and C (Hayman)
 
@@ -71,14 +73,23 @@ pdClean$t225 <- as.integer(pdClean$t225)
 ```
 
 
+
+# Prey Deliveryies Throughout Night
+
+Data was separated by study site and by incubation vs. nestling stage. Nestling period is defined as nest_age >= 22 days. If nest age was not indicated in original dataset, ES went back into field notes to determine whether nest was in incubation (all eggs) or nestling (at least one hatching) stage. For these records, ES manually input nest_age = 0 for incubation or nest_age = 100 for nestling, so that this data could be easily separated from known nest age.
+
 Get mean number of prey deliveries for each study site, by time interval
 
 ```{r}
 
-#create independet dfs for Hayman and Missouri. (since the last observation for Hayman is at t240, we'll end both datasets there)
-pdHFSA <- pdClean %>%
-  filter(study_site == "C") %>%
+#create independet dfs for HFSA (nestling and incubation stage) and MGSA (nestling and incubation state). (since the last observation for Hayman is at t240, we'll end both datasets there)
+pdIncH <- pdClean %>%
+  filter(study_site == "C", ) %>%
   select(t15:t240)
+
+pdNestH <- 
+
+
 pdMGSA <- pdClean %>%
   filter(study_site =="B") %>%
   select(t15:t240)
@@ -120,7 +131,7 @@ meanPD <- data.frame(
 
 
 
-# Calculate confidence intervals
+## Calculate confidence intervals
 
 
 ```{r}
@@ -134,7 +145,7 @@ getCI <- function(vec, n_samp=10000) {
 
 #now apply it across the columns of PD data
 ciHFSA <- apply(pdHFSA, 2, FUN = getCI)
-ciMGSA <- apply(pdMiss, 2, FUN = getCI)
+ciMGSA <- apply(pdMGSA, 2, FUN = getCI)
 ```
 
 
@@ -162,7 +173,7 @@ ggplot(data = ciMeanPD) +
                     group = study_area),
                 position = position_dodge(width=0.75)) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
-       title = "mean Prey Deliveries in HFSA and MGSA", color = "Study Area") +
+       title = "Mean Prey Deliveries in HFSA and MGSA", color = "Study Area") +
   theme_minimal()
 
 ```
