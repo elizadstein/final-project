@@ -23,7 +23,7 @@ library(tidyverse)
 
 ```{r}
 
-#setwd("C:/Users/eliza/Documents/final-project")
+setwd("C:/Users/eliza/Documents/final-project")
 pdOriginal <- read.csv("./data/pd_main.csv")
 
 
@@ -282,7 +282,7 @@ ggplot(data = ciAll) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Average Prey Deliveries Throughout Night", color = "Study Area") +
   theme_minimal() +
-  facet_grid(stage ~ .)
+  facet_grid(~ stage)
 
 ```
 
