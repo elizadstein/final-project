@@ -5,5 +5,10 @@ r:
   - oldrel
   - release
   - devel
+install: skip
 script:
   - R -e "source('tests/testthat.R')"
+deploy:
+  github-token: f6588e0dfb097d5c879a8384df47003cc2d7df33
+  on:
+    branch: master
