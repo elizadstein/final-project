@@ -5,6 +5,5 @@ r:
   - oldrel
   - release
   - devel
-install: skip
 script:
   - R -e "source('tests/testthat.R')"
