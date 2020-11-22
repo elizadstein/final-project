@@ -13,7 +13,9 @@ editor_options:
 ```{r}
 
 #install.packages("tidyverse")
+
 library(tidyverse)
+
 
 ```
 
@@ -250,7 +252,8 @@ plotInc <- ggplot(data = ciInc) +
                 position = position_dodge(width=0.75)) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Incubation", color = "Study Area") +
-  theme_minimal()
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -266,14 +269,15 @@ plotNest <- ggplot(data = ciNest) +
                 position = position_dodge(width=0.75)) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Nestling", color = "Study Area") +
-  theme_minimal()
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
 Both:
 ```{r}
 
-ggplot(data = ciAll) +
+plotAll <- ggplot(data = ciAll) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -282,10 +286,17 @@ ggplot(data = ciAll) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Average Prey Deliveries Throughout Night", color = "Study Area") +
   theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
   facet_grid(~ stage)
 
 ```
 
+Plot both as separate plots, side by side:
+```{r}
+
+grid.arrange(plotNest, plotInc)
+
+```
 
 
 
