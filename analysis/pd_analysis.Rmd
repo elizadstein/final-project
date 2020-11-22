@@ -7,15 +7,104 @@ editor_options:
   chunk_output_type: console
 ---
 
+# Introduction
 
-# Libraries
+write intro here.
+
+# Initialization
+
+## Required Packages
 
 ```{r}
 
-#install.packages("tidyverse")
 
+# Spatial data analysis
+#install.packages("raster")
+#install.packages("sf")
+#install.packages("RColorBrewer")
+library(sf)
+library(raster)
+library(RColorBrewer)
+
+# Data manipulation and visualization
+#install.packages("tidyverse")
 library(tidyverse)
 
+
+
+```
+
+## Custom functions:
+
+```{r}
+
+#' getFrac
+#' 
+#' @param vec a vector
+#' @param n_samp number of times to sample data
+#'
+#' @return upper and lower bootstrap confidence intervals
+#' 
+#'
+#' @examples
+#'    getCI(1:20, 1000)
+#' @export
+
+getCI <- function(vec, n_samp=10000) {
+  smp <- replicate(n_samp, mean(sample(vec, replace = TRUE), na.rm = TRUE))
+  CIs <-quantile(smp, c(0.025, 0.975), na.rm = T)
+  return(CIs)
+}
+
+```
+
+
+# Study Area
+
+## Hayman Fire Scar
+
+Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N. Extent:
+
+```{r}
+
+# Load Boundary
+burn_boundary <- st_read("analysis/images/hayman.shp")
+
+burn_severity <- raster("analysis/images/burn_severity/burn_severity.adf")
+
+# Get extent
+st_bbox(burn_boundary)
+
+
+
+#change hayman boundary class from `sf` to `spatial`
+fireSP <- as(fireSF, "Spatial")
+```
+
+Hayman fire plot: 
+
+```{r}
+#plot boundary
+ggplot() + 
+  geom_sf(data = fireSF, size = 1, color = "black")
+  ggtitle("Hayman Fire Scar") + 
+  coord_sf() +
+  theme_void()
+
+```
+
+
+```{r}
+#base r plot
+plot(burn_severity)
+
+```
+
+```{r}
+# to plot raster in ggplot, need to convert to df first
+ggplot() +
+  geom_raster(data = burn_severity, aes(x = x, y = y, fill = fct_elevation_2)) + 
+  coord_quickmap()
 
 ```
 
@@ -195,12 +284,7 @@ Write and apply function to obtain CIs.
 
 ```{r}
 
-#function to grab CIs from any vector
-getCI <- function(vec, n_samp=10000) {
-  smp <- replicate(n_samp, mean(sample(vec, replace = TRUE), na.rm = TRUE))
-  CIs <-quantile(smp, c(0.025, 0.975), na.rm = T)
-  return(CIs)
-}
+
 
 #now apply it across the columns of PD data
 ciHFSA_inc <- apply(pdHFSA_inc, 2, FUN = getCI)
