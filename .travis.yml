@@ -8,6 +8,3 @@ r:
 install: skip
 script:
   - R -e "source('tests/testthat.R')"
-deploy:
-  on:
-    branch: master
