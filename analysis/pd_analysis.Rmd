@@ -429,12 +429,21 @@ grid.arrange(plotNest, plotInc)
 
 
 
-## Prey Deliveries by Year
+# Prey Deliveries by Year
 
 Going to create a similar graph but with years on the x-axis. I will sum values from time = 15 through time = 60 and only use this data from the first hour of each night.
 
 ```{r}
+# Select relevant columns and mutate to sum PDs in first hour
+pdHour1 <- pdClean %>%
+  select(study_site, year, nest_age, t15, t30, t45, t60)
 
+pdNoNA <- na.omit(pdHour1)  
+
+# Delete rows with all NAs
+pdHour1 <- 
+  rowwise() %>%
+  mutate("hour1" = sum(c(t15, t30, t45, t60)))
 
 ```
 
