@@ -24,7 +24,10 @@ All relative paths begin at the final-project repository root directory.
 ```{r}
 # Data manipulation and visualization
 #install.packages("tidyverse")
+#install.packages("gridExtra")
 library(tidyverse)
+library(gridExtra)
+
 
 # Spatial data analysis
 #install.packages("raster")
@@ -154,14 +157,12 @@ plot(co_basemap)
 ```
 
 
-
-# Prey Delivery Rates
+# Prey Delivery Rates by Sex
 
 Load prey delivery data.
 
 ```{r}
 
-setwd("C:/Users/eliza/Documents/final-project")
 pdOriginal <- read.csv("./data/pd_main.csv")
 
 
@@ -171,28 +172,251 @@ names(pdOriginal)[1] <- "nest"
 
 ```
 
-
-Filter to only include males in B (MGSA) and C (HFSA).
+Filter to only include M and F (remove unknown and total), separate "nest" column into "study_site' and territory.
 
 ```{r}
 
-pdHM <- pdOriginal %>%
+pdMF <- pdOriginal %>%
   separate(col = nest, into = c("study_site", "territory"), sep = 1, remove = TRUE) %>%
+  filter(sex == "M" | sex == "F")
+
+```
+
+Check structure of data.
+
+```{r}
+
+str(pdMF)
+
+unique(pdMF$t180) #at least one cell has an asterisk after the value
+unique(pdMF$t225) #same here
+unique(pdMF$nest_age) #"pred" and "" can be converted to NA
+
+```
+
+Fix structure.
+
+```{r}
+#remove asterisks
+pdClean <- pdMF %>%
+  mutate(t180 = gsub("\\*", "", t180)) %>%
+  mutate(t225 = gsub("\\*", "", t225))
+
+
+#change these columns to numeric
+pdClean$t180 <- as.integer(pdClean$t180)
+pdClean$t225 <- as.integer(pdClean$t225)
+pdClean$nest_age <- as.integer(pdClean$nest_age) #warning here is ok--NAs are replacing "pred" and "" values
+
+
+```
+
+
+## Prey Deliveries Throughout Night
+
+Data was separated by sex (M vs. F) and by incubation vs. nestling stage. Nestling period is defined as nest_age >= 22 days. If nest age was not indicated in original dataset, field notes were used to determine whether nest was in incubation (all eggs) or nestling (at least one nestling) stage. For these records, the following values were manually input: nest_age = 0 for incubation or nest_age = 100 for nestling, so that this data could be easily separated from known nest age.  If it was later determined that nest had been predated before observation, "pred" was entered. If the nest stage could not be determined, it was left blank."pred" and "" values were converted to NA earlier when this column was converted to numeric.
+
+```{r}
+
+# Create independent dfs for M (nestling and incubation stage) and F (nestling and incubation state). 
+
+#select relevant columns, add column for stage, rename study sites, drop NAs
+pdStage1 <- pdClean %>%
+  dplyr::select(sex, nest_age, t15:t240) %>%
+  mutate(
+    stage =
+      ifelse(nest_age < 22, "incubation", "nestling")) %>%
+  drop_na(stage)
+
+#change column names to remove "t" in front of time interval
+colnames(pdStage1) <- c("sex", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
+
+#create independent dfs for each study site and stage
+pdM_inc <- pdStage1 %>%
+  filter(sex =="M", stage == "incubation") %>%
+  dplyr::select('15':'240')
+
+pdM_nest <- pdStage1 %>% 
+  filter(sex =="M", stage == "nestling") %>%
+  dplyr::select('15':'240')
+
+pdF_inc <- pdStage1 %>%
+  filter(sex =="F", stage == "incubation") %>%
+  dplyr::select('15':'240')
+         
+pdF_nest <- pdStage1 %>%
+  filter(sex =="F", stage == "nestling") %>%
+  dplyr::select('15':'240')
+
+```
+
+## Mean PD tables
+
+Four stand-alone data.frames, one for M (incubation), one for M (nestling), one for F (incubation), and one for F (nestling):
+
+```{r}
+
+meanM_inc <- data.frame(
+  time = as.numeric(colnames(pdM_inc)),
+  M_incubation = colMeans(pdM_inc, na.rm = TRUE))
+
+meanM_nest <- data.frame(
+  time = as.numeric(colnames(pdM_nest)),
+  M_nestling = colMeans(pdM_nest, na.rm = TRUE))
+
+meanF_inc <- data.frame(
+  time = as.numeric(colnames(pdF_inc)),
+  F_incubation = colMeans(pdF_inc, na.rm = TRUE))
+
+meanF_nest <- data.frame(
+  time = as.numeric(colnames(pdF_nest)),
+  F_nestling = colMeans(pdF_nest, na.rm = TRUE))
+
+```
+
+
+One table showing mean PDs for all study sites and stages:
+
+```{r}
+meanMF <- data.frame(
+  time = as.numeric(colnames(pdM_inc)),
+  M_incubation = colMeans(pdM_inc, na.rm = TRUE),
+  M_nestling = colMeans(pdM_nest, na.rm = TRUE),
+  F_incubation = colMeans(pdF_inc, na.rm = TRUE),
+  F_nestling = colMeans(pdF_nest, na.rm = TRUE)
+)
+
+```
+
+
+
+
+## Calculate confidence intervals
+
+Write and apply function to obtain CIs.
+
+```{r}
+
+#now apply it across the columns of PD data
+ciM_inc <- apply(pdM_inc, 2, FUN = getCI)
+ciM_nest <- apply(pdM_nest, 2, FUN = getCI)
+ciF_inc <- apply(pdF_inc, 2, FUN = getCI)
+ciF_nest <- apply(pdF_nest, 2, FUN = getCI)
+```
+
+
+Add CIs to a data frame. Remove rows where time > 180 for ciInc because no data is available for MGSA after this time.
+
+```{r}
+
+ciInc_sex <- data.frame(
+    sex = c(rep("M", nrow(meanM_inc)), rep("F", nrow(meanF_inc))),
+    mean = c(colMeans(pdM_inc, na.rm = TRUE), colMeans(pdF_inc, na.rm = TRUE)),
+    ci_l = c(ciM_inc[1,], ciF_inc[1,]),
+    ci_h = c(ciM_inc[2,], ciF_inc[2,]),
+    time = c(as.numeric(rownames(meanM_inc)), as.numeric(rownames(meanF_inc))),
+    stage = "Incubation")
+
+
+ciNest_sex <- data.frame(
+    sex = c(rep("M", nrow(meanM_nest)), rep("F", nrow(meanF_nest))),
+    mean = c(colMeans(pdM_nest, na.rm = TRUE), colMeans(pdF_nest, na.rm = TRUE)),
+    ci_l = c(ciM_nest[1,], ciF_nest[1,]),
+    ci_h = c(ciM_nest[2,], ciF_nest[2,]),
+    time = c(as.numeric(rownames(meanM_nest)), as.numeric(rownames(meanF_nest))),
+    stage = "Nestling")
+    
+ciAll_sex <- rbind(ciInc_sex, ciNest_sex)
+
+```
+
+
+
+## Plot
+
+Incubation:
+```{r}
+
+plotInc_sex <- ggplot(data = ciInc_sex) +
+  geom_point(aes(x = time, y = mean, color = sex, group = sex),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
+                    group = sex),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Incubation", color = "Sex") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+Nestling:
+```{r}
+
+plotNest_sex <- ggplot(data = ciNest_sex) +
+  geom_point(aes(x = time, y = mean, color = sex, group = sex),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
+                    group = sex),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Nestling", color = "Sex") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+Plot both as separate plots, side by side:
+```{r}
+
+grid.arrange(plotInc_sex, plotNest_sex)
+
+```
+
+
+Independent t-test for incubation stage. p = 5.163e-09
+```{r}
+
+t.test(meanF_inc$F_incubation, meanM_inc$M_incubation)
+
+```
+
+Independent t-test for nestling stage. p = 1.355e-08
+```{r}
+
+t.test(meanF_nest$F_nestling, meanM_nest$M_nestling)
+
+```
+
+# Prey Delivery Rates by Site
+
+
+Filter pdMF to only include males in B (MGSA) and C (HFSA).
+
+```{r}
+
+pdHM <- pdClean %>%
   filter(study_site == "B" | study_site == "C", sex == "M")
 
 ```
 
 
-Check structure of data.
+REMOVE Check structure of data.
 
-```{r, structure}
+```{r eval=FALSE, include=FALSE}
 
-#str(pdHM) #columns 't180' and 't225' are character classes, "nest_age" is character class
+str(pdHM) #columns 't180' and 't225' are character classes, "nest_age" is character class
 
-#unique(pdHM$t180) #at least one cell has an asterisk after the value
-#unique(pdHM$t225) #same here
-#unique(pdHM$nest_age) #"pred" and "" can be converted to NA
+unique(pdHM$t180) #at least one cell has an asterisk after the value
+unique(pdHM$t225) #same here
+unique(pdHM$nest_age) #"pred" and "" can be converted to NA
+```
 
+REMOVE Fix structure.
+
+```{r}
 #remove asterisks
 pdClean <- pdHM %>%
   mutate(t180 = gsub("\\*", "", t180)) %>%
@@ -211,7 +435,7 @@ pdClean$nest_age <- as.integer(pdClean$nest_age) #warning here is ok--NAs are re
 
 ## Visualize prey deliveries throughout night
 
-Data was separated by study site (HFSA vs. MGSA) and by incubation vs. nestling stage. Nestling period is defined as nest_age >= 22 days. If nest age was not indicated in original dataset, field notes were used to determine whether nest was in incubation (all eggs) or nestling (at least one nestling) stage. For these records, the following values were manually input: nest_age = 0 for incubation or nest_age = 100 for nestling, so that this data could be easily separated from known nest age.  If it was later determined that nest had been predated before observation, "pred" was entered. If the nest stage could not be determined, it was left blank."pred" and "" values were converted to NA earlier when this column was converted to numeric.
+Data was separated by study site (HFSA vs. MGSA) and by incubation vs. nestling stage. 
 
 since the last observation for HFSA is at time = 240, we'll end both datasets there.
 
@@ -223,7 +447,7 @@ First, create data frame with PDs for whole dataset, then broken down by each st
 
 #select relevant columns, add column for stage, rename study sites, drop NAs
 pdStage <- pdClean %>%
-  select(study_site, nest_age, t15:t240) %>%
+  dplyr::select(study_site, nest_age, t15:t240) %>%
   mutate(
     stage =
       ifelse(nest_age < 22, "incubation", "nestling"),
@@ -237,19 +461,19 @@ colnames(pdStage) <- c("study_site", "nest_age", "15", "30", "45", "60", "75", "
 #create independent dfs for each study site and stage
 pdHFSA_inc <- pdStage %>%
   filter(study_site =="HFSA", stage == "incubation") %>%
-  select('15':'240')
+  dplyr::select('15':'240')
 
 pdHFSA_nest <- pdStage %>% 
   filter(study_site =="HFSA", stage == "nestling") %>%
-  select('15':'240')
+  dplyr::select('15':'240')
 
 pdMGSA_inc <- pdStage %>%
   filter(study_site =="MGSA", stage == "incubation") %>%
-  select('15':'240')
+  dplyr::select('15':'240')
          
 pdMGSA_nest <- pdStage %>%
   filter(study_site =="MGSA", stage == "nestling") %>%
-  select('15':'240')
+  dplyr::select('15':'240')
 
 
 ```
@@ -265,11 +489,11 @@ Four stand-alone data.frames, one for (incubation), one for HFSA (nestling), one
 
 meanHFSA_inc <- data.frame(
   time = as.numeric(colnames(pdHFSA_inc)),
-  HGSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE))
+  HFSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE))
 
 meanHFSA_nest <- data.frame(
   time = as.numeric(colnames(pdHFSA_nest)),
-  HGSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE))
+  HFSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE))
 
 meanMGSA_inc <- data.frame(
   time = as.numeric(colnames(pdMGSA_inc)),
@@ -290,7 +514,7 @@ Two tables, one for nestling stage and one for incubation stage. This is just fo
 meanInc <- filter(
   data.frame(
     time = as.numeric(colnames(pdHFSA_inc)),
-    HGSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE),
+    HFSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE),
     MGSA_incubation = colMeans(pdMGSA_inc, na.rm = TRUE)),
   time <= 180
 )
@@ -298,7 +522,7 @@ meanInc <- filter(
 meanNest <-
   data.frame(
   time = as.numeric(colnames(pdHFSA_nest)),
-  HGSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE),
+  HFSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE),
   MGSA_nestling = colMeans(pdMGSA_nest, na.rm = TRUE)
 )
 
@@ -309,8 +533,8 @@ One table showing mean PDs for all study sites and stages:
 ```{r}
 meanAll <- data.frame(
   time = as.numeric(colnames(pdHFSA_inc)),
-  HGSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE),
-  HGSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE),
+  HFSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE),
+  HFSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE),
   MGSA_incubation = colMeans(pdMGSA_inc, na.rm = TRUE),
   MGSA_nestling = colMeans(pdMGSA_nest, na.rm = TRUE)
 )
@@ -422,16 +646,33 @@ grid.arrange(plotNest, plotInc)
 
 ```
 
+## Test for Difference
+
+Independent t-tests for incubation stage. p = 0.8786
+```{r}
+
+t.test(meanInc$HFSA_incubation, meanInc$MGSA_incubation)
+
+```
+
+
+Independent t-tests for nestling stage. p = 0.377
+
+```{r}
+
+t.test(meanNest$HFSA_nestling, meanNest$MGSA_nestling)
+
+```
 
 
 # Prey Deliveries by Year
 
 Going to create a similar graph but with years on the x-axis. I will sum values from time = 15 through time = 60 and only use this data from the first hour of each night.
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Select relevant columns and mutate to sum PDs in first hour
 pdHour1 <- pdClean %>%
-  select(study_site, year, nest_age, t15, t30, t45, t60)
+  dplyr::select(study_site, year, nest_age, t15, t30, t45, t60)
 
 pdNoNA <- na.omit(pdHour1)  
 
@@ -445,10 +686,15 @@ pdHour1 <-
 
 # References
 
-Graham, Russell T. 2003. "Hayman Fire case study." General Technical Report RMRS-GTR-114, United States Department of Agriculture. 
+Graham, Russell T. 2003. Hayman Fire case study. General Technical Report RMRS-GTR-114, United States Department of Agriculture. 
 
-Griffis, Kerry L., et al. 2001. "Understory response to management treatments in northern Arizona ponderosa pine forests." Forest Ecology and Management 146(1): 239-245.
+Griffis, Kerry L., et al. 2001. Understory response to management treatments in northern Arizona ponderosa pine forests. Forest Ecology and Management 146(1): 239-245.
 
-Veblen, Thomas T., Thomas Kitzberger, and Joseph Donnegan. 2000. "Climatic and human influences on fire regimes in ponderosa pine forests in the Colorado Front Range." Ecological Applications 10(4) (2000): 1178-1195. 
+Linkhart, B. D., and D. A. McCallum. 2013. Flammulated owl (*Psiloscops flammeolus*). The birds of North America online. Accessed 11/22/2020.
 
-Linkhart, B. D., and D. A. McCallum. 2013. "Flammulated owl (Psiloscops flammeolus)." The birds of North America online. Accessed 11/22/2020.
+Nappi, A., P. Drapeau, M. Saint-Germain, and V.A. Angers. 2010. Effects of fire severity on long-term occupancy of burned boreal conifer forests by saproxylic insects and wood-foraging birds. International Journal of Wildland Fire 19(4): 500-511.
+
+Veblen, Thomas T., Thomas Kitzberger, and Joseph Donnegan. 2000. Climatic and human influences on fire regimes in ponderosa pine forests in the Colorado Front Range. Ecological Applications 10(4) (2000): 1178-1195. 
+
+Zarybnicka, M., O. Sedlacek, and E. Korpimaki. 2009. Do Tengmalm's Owls alter parental feeding effort under varying conditions of main prey availability? Journal of Ornithology 150(1): 231-237.
+
