@@ -22,9 +22,11 @@ write intro here.
 #install.packages("raster")
 #install.packages("sf")
 #install.packages("RColorBrewer")
+#install.packages("rgdal")
 library(sf)
 library(raster)
 library(RColorBrewer)
+library(rgdal)
 
 # Data manipulation and visualization
 #install.packages("tidyverse")
@@ -68,25 +70,60 @@ Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N. 
 ```{r}
 
 # Load Boundary
-burn_boundary <- st_read("analysis/images/hayman.shp")
-
-burn_severity <- raster("analysis/images/burn_severity/burn_severity.adf")
+boundary_sf <- st_read("./final-project/analysis/images/hayman.shp")
 
 # Get extent
-st_bbox(burn_boundary)
+st_bbox(boundary_sf)
 
 
 
-#change hayman boundary class from `sf` to `spatial`
-fireSP <- as(fireSF, "Spatial")
+#change hayman boundary class from `sf` to `spatial`?
+
 ```
+
+Load in raster data:
+
+```{r}
+
+# Load raster image
+severity <- raster("./final-project/analysis/images/burn_severity/burn_severity.adf")
+
+#change boundary class from `sf` to `spatial`
+boundary_sp <- as(boundary_sf, "Spatial")
+
+#first crop raster by the bounding box of the perimeter .shp
+severity_crop <- crop(severity, boundary_sp)
+
+#then mask by actual polygon
+severity_crop <- mask(severity_crop, boundary_sp)
+
+
+# Convert to df
+severity_df <- raster::as.data.frame(severity_crop, xy = TRUE)
+# remove weird red hole in middle
+severity_df$burn_severity[severity_df$burn_severity == 6] <- NA
+
+# Plot
+fire_colors <- rev(brewer.pal(n = 7, "RdYlGn")) %>%
+  colorRampPalette()
+
+ggplot() +
+  geom_raster(data = severity_df, aes(x = x, y = y, 
+    fill = burn_severity)) +
+  scale_fill_gradientn(name = "Severity", colors = fire_colors(7), na.value = "white") +
+  ggtitle("Hayman Fire Scar") + 
+  theme_void()
+
+
+```
+
 
 Hayman fire plot: 
 
 ```{r}
 #plot boundary
 ggplot() + 
-  geom_sf(data = fireSF, size = 1, color = "black")
+  geom_sf(data = boundary_sf, size = 1, color = "black") +
   ggtitle("Hayman Fire Scar") + 
   coord_sf() +
   theme_void()
@@ -96,7 +133,8 @@ ggplot() +
 
 ```{r}
 #base r plot
-plot(burn_severity)
+
+plot(severity, rev(brewer.pal(n = 7, name = "YlOrRd")))
 
 ```
 
@@ -104,7 +142,7 @@ plot(burn_severity)
 # to plot raster in ggplot, need to convert to df first
 ggplot() +
   geom_raster(data = burn_severity, aes(x = x, y = y, fill = fct_elevation_2)) + 
-  coord_quickmap()
+  coord_quickmap() 
 
 ```
 
