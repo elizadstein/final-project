@@ -16,23 +16,22 @@ write intro here.
 ## Required Packages
 
 ```{r}
-
+# Data manipulation and visualization
+#install.packages("tidyverse")
+library(tidyverse)
 
 # Spatial data analysis
 #install.packages("raster")
 #install.packages("sf")
 #install.packages("RColorBrewer")
 #install.packages("rgdal")
+#install.packages("ggmap")
+
 library(sf)
 library(raster)
 library(RColorBrewer)
 library(rgdal)
-
-# Data manipulation and visualization
-#install.packages("tidyverse")
-library(tidyverse)
-
-
+library(ggmap)
 
 ```
 
@@ -75,11 +74,10 @@ boundary_sf <- st_read("./final-project/analysis/images/hayman.shp")
 # Get extent
 st_bbox(boundary_sf)
 
-
-
 #change hayman boundary class from `sf` to `spatial`?
 
 ```
+
 
 Load in raster data:
 
@@ -97,7 +95,6 @@ severity_crop <- crop(severity, boundary_sp)
 #then mask by actual polygon
 severity_crop <- mask(severity_crop, boundary_sp)
 
-
 # Convert to df
 severity_df <- raster::as.data.frame(severity_crop, xy = TRUE)
 # remove weird red hole in middle
@@ -107,43 +104,53 @@ severity_df$burn_severity[severity_df$burn_severity == 6] <- NA
 fire_colors <- rev(brewer.pal(n = 7, "RdYlGn")) %>%
   colorRampPalette()
 
-ggplot() +
+severity_plot <- ggplot() +
   geom_raster(data = severity_df, aes(x = x, y = y, 
     fill = burn_severity)) +
-  scale_fill_gradientn(name = "Severity", colors = fire_colors(7), na.value = "white") +
-  ggtitle("Hayman Fire Scar") + 
+  scale_fill_gradientn(name = "Burn Severity", colors = fire_colors(7), na.value = "white") +
   theme_void()
 
 
 ```
 
 
-Hayman fire plot: 
+Severity with boundary: 
 
 ```{r}
-#plot boundary
-ggplot() + 
-  geom_sf(data = boundary_sf, size = 1, color = "black") +
-  ggtitle("Hayman Fire Scar") + 
+#plot severity with boundary overlay
+sev_bound_plot <- severity_plot + 
+  geom_sf(data = boundary_sf, size = 1, color = "black", fill = NA) +
   coord_sf() +
   theme_void()
 
 ```
 
+Add nest location data (n = 45):
 
 ```{r}
-#base r plot
+# Read in nest tree data
+nest_dat <- read.csv("./data/nest_trees.csv")
 
-plot(severity, rev(brewer.pal(n = 7, name = "YlOrRd")))
+# Plot nest trees over Hayman burn map
+sev_bound_plot +
+  geom_point(data = nest_dat, mapping = aes(x = x_coord, y = y_coord), color = "red") +
+  ggtitle("Hayman Fire Nest Sites") +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5))
+
 
 ```
 
-```{r}
-# to plot raster in ggplot, need to convert to df first
-ggplot() +
-  geom_raster(data = burn_severity, aes(x = x, y = y, fill = fct_elevation_2)) + 
-  coord_quickmap() 
 
+Plot Hayman over CO basemap (maybe remove):
+```{r}
+# Get extent of Hayman from shapefile
+st_bbox(boundary_sf)
+
+co_basemap <- get_map(location=c(left = -46.18558, bottom = 43.156723, right = -49.08987, top = 43.524593), zoom=11, maptype = 'terrain-background', source = 'stamen')
+
+
+plot(co_basemap)
 ```
 
 
