@@ -23,10 +23,11 @@ All relative paths begin at the final-project repository root directory.
 
 ## Required Packages
 
-```{r include=FALSE}
+```{r}
 # Data manipulation and visualization
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
 install.packages("gridExtra", repos='http://cran.us.r-project.org')
+install.packages("pandoc", repos='http://cran.us.r-project.org')
 
 ```
 
@@ -43,6 +44,7 @@ install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 # Data manipulation and visualization
 library(tidyverse)
 library(gridExtra)
+library(pandoc)
 ```
 
 ```{r eval=FALSE, include=FALSE}
@@ -637,7 +639,7 @@ grid.arrange(plotInc, plotNest)
 Independent t-tests for incubation stage. p = 0.8786
 ```{r}
 
-t.test(meanInc$HFSA_incubation, meanInc$MGSA_incubation)
+t.test(meanHFSA_inc$HFSA_incubation, meanMGSA_inc$MGSA_incubation)
 
 ```
 
@@ -646,7 +648,7 @@ Independent t-tests for nestling stage. p = 0.377
 
 ```{r}
 
-t.test(meanNest$HFSA_nestling, meanNest$MGSA_nestling)
+t.test(meanHFSA_nest$HFSA_nestling, meanMGSA_nest$MGSA_nestling)
 
 ```
 
