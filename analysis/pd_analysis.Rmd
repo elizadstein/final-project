@@ -29,9 +29,12 @@ install.packages("gridExtra")
 
 # Spatial data analysis
 install.packages("raster")
+install.packages("methods")
+install.packages("rgdal")
+install.packages("sp")
 install.packages("sf")
 install.packages("RColorBrewer")
-install.packages("rgdal")
+
 #install.packages("ggmap")
 ```
 
