@@ -23,19 +23,24 @@ All relative paths begin at the final-project repository root directory.
 
 ```{r}
 # Data manipulation and visualization
-#install.packages("tidyverse")
-#install.packages("gridExtra")
-library(tidyverse)
-library(gridExtra)
+install.packages("tidyverse")
+install.packages("gridExtra")
 
 
 # Spatial data analysis
-#install.packages("raster")
-#install.packages("sf")
-#install.packages("RColorBrewer")
-#install.packages("rgdal")
+install.packages("raster")
+install.packages("sf")
+install.packages("RColorBrewer")
+install.packages("rgdal")
 #install.packages("ggmap")
+```
 
+```{r}
+# Data manipulation and visualization
+library(tidyverse)
+library(gridExtra)
+
+# Spatial data analysis
 library(sf)
 library(raster)
 library(RColorBrewer)
@@ -376,6 +381,8 @@ grid.arrange(plotInc_sex, plotNest_sex)
 ```
 
 
+## Test for Difference
+
 Independent t-test for incubation stage. p = 5.163e-09
 ```{r}
 
@@ -399,35 +406,6 @@ Filter pdMF to only include males in B (MGSA) and C (HFSA).
 
 pdHM <- pdClean %>%
   filter(study_site == "B" | study_site == "C", sex == "M")
-
-```
-
-
-REMOVE Check structure of data.
-
-```{r eval=FALSE, include=FALSE}
-
-str(pdHM) #columns 't180' and 't225' are character classes, "nest_age" is character class
-
-unique(pdHM$t180) #at least one cell has an asterisk after the value
-unique(pdHM$t225) #same here
-unique(pdHM$nest_age) #"pred" and "" can be converted to NA
-```
-
-REMOVE Fix structure.
-
-```{r}
-#remove asterisks
-pdClean <- pdHM %>%
-  mutate(t180 = gsub("\\*", "", t180)) %>%
-  mutate(t225 = gsub("\\*", "", t225))
-
-
-#change these columns to numeric
-pdClean$t180 <- as.integer(pdClean$t180)
-pdClean$t225 <- as.integer(pdClean$t225)
-pdClean$nest_age <- as.integer(pdClean$nest_age) #warning here is ok--NAs are replacing "pred" and "" values
-
 
 ```
 
@@ -642,7 +620,7 @@ plotAll <- ggplot(data = ciAll) +
 Plot both as separate plots, side by side:
 ```{r}
 
-grid.arrange(plotNest, plotInc)
+grid.arrange(plotInc, plotNest)
 
 ```
 
