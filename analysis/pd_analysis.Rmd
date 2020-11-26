@@ -2,8 +2,10 @@
 title: "Prey Delivery Analysis"
 author: "Eliza Stein"
 date: "11/8/2020"
-output: pdf_document
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: console
 ---
 
@@ -21,19 +23,18 @@ All relative paths begin at the final-project repository root directory.
 
 ## Required Packages
 
-```{r}
+```{r include=FALSE}
 # Data manipulation and visualization
-install.packages("tidyverse")
-install.packages("gridExtra")
+install.packages("tidyverse", repos='http://cran.us.r-project.org')
+install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
 
 # Spatial data analysis
-install.packages("raster")
-install.packages("methods")
-install.packages("rgdal")
-install.packages("sp")
-install.packages("sf")
-install.packages("RColorBrewer")
+install.packages("sp", repos='http://cran.us.r-project.org')
+install.packages("raster", repos='http://cran.us.r-project.org')
+install.packages("rgdal", repos='http://cran.us.r-project.org')
+install.packages("sf", repos='http://cran.us.r-project.org')
+install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 
 #install.packages("ggmap")
 ```
