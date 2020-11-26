@@ -1,10 +1,17 @@
 language: r
 os: linux
-dist: focal
+cache: packages
+sudo: required
+dist: xenial
 r:
   - oldrel
   - release
   - devel
-install: skip
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntugis/ppa --yes
+  - sudo apt-get --yes --force-yes update -qq
+  - sudo apt-get install --yes libudunits2-dev libproj-dev libgeos-dev libgdal-dev
+
 script:
   - R -e "source('tests/testthat.R')"
