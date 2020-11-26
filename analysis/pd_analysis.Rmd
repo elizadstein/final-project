@@ -30,13 +30,11 @@ install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
 
 # Spatial data analysis
-#install.packages("sp", repos='http://cran.us.r-project.org')
+install.packages("sp", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
 install.packages("raster", repos='http://cran.us.r-project.org')
-#install.packages("rgdal", repos='http://cran.us.r-project.org')
-install.packages("sf", repos='http://cran.us.r-project.org')
+install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+install.packages("sf", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
 install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
-
-#install.packages("ggmap")
 ```
 
 ```{r}
@@ -45,9 +43,9 @@ library(tidyverse)
 library(gridExtra)
 
 # Spatial data analysis
-#library(sp)
+library(sp)
 library(raster)
-#library(rgdal)
+library(rgdal)
 library(sf)
 library(RColorBrewer)
 #library(ggmap)
