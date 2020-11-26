@@ -1,21 +1,25 @@
 ---
-title: "Prey Delivery Analysis"
+output:
+  pdf_document:
+    citation_package: natbib
+    keep_tex: false
+    latex_engine: xelatex
+title: "Prey Delivery Rates in Disturbed Environment"
 author: "Eliza Stein"
 date: "11/8/2020"
-output:
-  html_document:
-    df_print: paged
+bibliography: references.bib
+csl: './apa.csl'
 editor_options:
   chunk_output_type: console
 ---
 
 # Introduction
 
-Fire plays an important role as a consistent disturbance in maintaining open stands of old-growth Ponderosa Pine (*Pinus ponderosa*) forests by helping to eliminate understory and limit fuel loads (Veblen et al. 2000). Before human intervention, Ponderosa Pine forests naturally underwent forest fires in 5-50 year intervals (Veblen et al. 2000). Over the past century, however, tree planting initiatives and increased implementation of fire suppression have led to increased density of stands (Griffis et al. 2001), making forest stands that are already drought stressed even more susceptible to high severity crown fires (Veblen et. al 2000). In 2002, a human-caused wildfire, the Hayman Fire, burned 138,000 acres of old-growth Ponderosa pine forests in Colorado's Pike National Forest (Graham 2003). 
+Fire plays an important role as a consistent disturbance in maintaining open stands of old-growth Ponderosa Pine (*Pinus ponderosa*) forests by helping to eliminate understory and limit fuel loads [@veblen2000climatic]. Before human intervention, Ponderosa Pine forests naturally underwent forest fires in 5-50 year intervals [@veblen2000climatic]. Over the past century, however, tree planting initiatives and increased implementation of fire suppression have led to increased density of stands [@griffis2001understory], making forest stands that are already drought stressed even more susceptible to high severity crown fires [@veblen2000climatic]. In 2002, a human-caused wildfire, the Hayman Fire, burned 138,000 acres of old-growth Ponderosa pine forests in Colorado's Pike National Forest [@graham2003hayman]. 
 
-The Flammulated Owl (*Psiloscops flammeolus*) is a territorial, insectivorous, and nocturnal raptor native to montane forests in portions of the Rocky Mountains, Sierra Nevada Mountains, and the Occidental Mountains (Linkhart and McCallum, 2013). The diet of the owl primarily consists of moths native to these regions (Linkhart and McCallum, 2013). As a highly specialized secondary cavity nesting raptor, the Flammulated Owl is deemed an indicator species, meaning that the health of an ecosystem can be estimated based on the health of their population. Survival models have shown that Flammulated Owl survival in the HFSA is currently lower than survival in MGSA, suggesting that mortality, rather than emigration, explains most of the population declines following the Hayman Fire (Linkhart and Yanco, unpublished data).
+The Flammulated Owl (*Psiloscops flammeolus*) is a territorial, insectivorous, and nocturnal raptor native to montane forests in portions of the Rocky Mountains, Sierra Nevada Mountains, and the Occidental Mountains [@linkhart2013flammulated]. The diet of the owl primarily consists of moths native to these regions [@linkhart2013flammulated]. As a highly specialized secondary cavity nesting raptor, the Flammulated Owl is deemed an indicator species, meaning that the health of an ecosystem can be estimated based on the health of their population. Survival models have shown that Flammulated Owl survival in the HFSA is currently lower than survival in MGSA, suggesting that mortality, rather than emigration, explains most of the population declines following the Hayman Fire (Linkhart and Yanco, unpublished data).
 
-Here, I examine one possible explanation for increased mortality in HFSA: prey availability. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources (Nappi et al. 2010). If Flammulated Owls are adapting their behavior in response to changing prey availability, I would expect that the rate of prey deliveries to active nests would increase or decrease (increase if prey is lower quality, decrease if prey is more scarce or difficult to detect) (Zarybnicka 2009). If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which do not occupy landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes.
+Here, I examine one possible explanation for increased mortality in HFSA: prey availability. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources [@nappi2010effect]. If Flammulated Owls are adapting their behavior in response to changing prey availability, I would expect that the rate of prey deliveries to active nests would increase or decrease (increase if prey is lower quality, decrease if prey is more scarce or difficult to detect) [@zarybnicka2009tengmalm]. If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which do not occupy landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes.
 
 # Initialization
 
@@ -24,6 +28,9 @@ All relative paths begin at the final-project repository root directory.
 ## Required Packages
 
 ```{r}
+# LaTex
+tinytex::install_tinytex()
+
 # Data manipulation and visualization
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
 install.packages("gridExtra", repos='http://cran.us.r-project.org')
@@ -70,10 +77,10 @@ library(RColorBrewer)
 #' 
 #'
 #' @examples
-#'    getCI(1:20, 1000)
+#'    getCI(1:20, 2000)
 #' @export
 
-getCI <- function(vec, n_samp=10000) {
+getCI <- function(vec, n_samp=1000) {
   smp <- replicate(n_samp, mean(sample(vec, replace = TRUE), na.rm = TRUE))
   CIs <-quantile(smp, c(0.025, 0.975), na.rm = T)
   return(CIs)
@@ -176,7 +183,9 @@ Load prey delivery data.
 
 ```{r}
 
-pdOriginal <- read.csv("./data/pd_main.csv")
+getwd()
+
+pdOriginal <- read.csv("../data/pd_main.csv")
 
 
 #rename the first column, which imported with a special character
@@ -199,7 +208,7 @@ Check structure of data.
 
 ```{r}
 
-str(pdMF)
+pd_str <- str(pdMF)
 
 unique(pdMF$t180) #at least one cell has an asterisk after the value
 unique(pdMF$t225) #same here
@@ -650,20 +659,3 @@ Independent t-tests for nestling stage. p = 0.377
 t.test(meanHFSA_nest$HFSA_nestling, meanMGSA_nest$MGSA_nestling)
 
 ```
-
-
-
-# References
-
-Graham, Russell T. 2003. Hayman Fire case study. General Technical Report RMRS-GTR-114, United States Department of Agriculture. 
-
-Griffis, Kerry L., et al. 2001. Understory response to management treatments in northern Arizona ponderosa pine forests. Forest Ecology and Management 146(1): 239-245.
-
-Linkhart, B. D., and D. A. McCallum. 2013. Flammulated owl (*Psiloscops flammeolus*). The birds of North America online. Accessed 11/22/2020.
-
-Nappi, A., P. Drapeau, M. Saint-Germain, and V.A. Angers. 2010. Effects of fire severity on long-term occupancy of burned boreal conifer forests by saproxylic insects and wood-foraging birds. International Journal of Wildland Fire 19(4): 500-511.
-
-Veblen, Thomas T., Thomas Kitzberger, and Joseph Donnegan. 2000. Climatic and human influences on fire regimes in ponderosa pine forests in the Colorado Front Range. Ecological Applications 10(4) (2000): 1178-1195. 
-
-Zarybnicka, M., O. Sedlacek, and E. Korpimaki. 2009. Do Tengmalm's Owls alter parental feeding effort under varying conditions of main prey availability? Journal of Ornithology 150(1): 231-237.
-
