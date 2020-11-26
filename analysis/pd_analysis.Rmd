@@ -30,9 +30,9 @@ install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
 
 # Spatial data analysis
-install.packages("sp", repos='http://cran.us.r-project.org')
+#install.packages("sp", repos='http://cran.us.r-project.org')
 install.packages("raster", repos='http://cran.us.r-project.org')
-install.packages("rgdal", repos='http://cran.us.r-project.org')
+#install.packages("rgdal", repos='http://cran.us.r-project.org')
 install.packages("sf", repos='http://cran.us.r-project.org')
 install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 
@@ -45,10 +45,11 @@ library(tidyverse)
 library(gridExtra)
 
 # Spatial data analysis
-library(sf)
+#library(sp)
 library(raster)
+#library(rgdal)
+library(sf)
 library(RColorBrewer)
-library(rgdal)
 #library(ggmap)
 
 ```
@@ -106,10 +107,10 @@ severity <- raster("./analysis/images/burn_severity/burn_severity.adf")
 boundary_sp <- as(boundary_sf, "Spatial")
 
 # Use fire boundary to crop fire severity raster
-severity_crop <- crop(severity, boundary_sp)
+severity_crop <- raster::crop(severity, boundary_sp)
 
 # Then mask by actual polygon
-severity_crop <- mask(severity_crop, boundary_sp)
+severity_crop <- raster::mask(severity_crop, boundary_sp)
 
 # Convert to df
 severity_df <- raster::as.data.frame(severity_crop, xy = TRUE)
