@@ -28,7 +28,9 @@ All relative paths begin at the final-project repository root directory.
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
 install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
+```
 
+```{r eval=FALSE, include=FALSE}
 # Spatial data analysis
 install.packages("sp", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
 install.packages("raster", repos='http://cran.us.r-project.org')
@@ -41,7 +43,9 @@ install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 # Data manipulation and visualization
 library(tidyverse)
 library(gridExtra)
+```
 
+```{r eval=FALSE, include=FALSE}
 # Spatial data analysis
 library(sp)
 library(raster)
@@ -83,7 +87,7 @@ getCI <- function(vec, n_samp=10000) {
 
 Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N. 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 # Load Boundary
 boundary_sf <- st_read("./analysis/images/hayman.shp")
@@ -96,7 +100,7 @@ ext <- st_bbox(boundary_sf)
 
 Load in fire severity raster data:
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 # Load raster image
 severity <- raster("./analysis/images/burn_severity/burn_severity.adf")
@@ -137,7 +141,7 @@ sev_bound_plot <- severity_plot +
 
 Plot nest locations (n = 45) on Hayman Fire severity map:
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Read in nest tree data
 nest_dat <- read.csv("./data/nest_trees.csv")
 
@@ -154,7 +158,7 @@ sev_bound_plot +
 
 Plot Hayman over CO basemap (maybe remove):
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Get extent of Hayman from shapefile
 st_bbox(boundary_sf)
 
@@ -214,8 +218,9 @@ pdClean <- pdMF %>%
 #change these columns to numeric
 pdClean$t180 <- as.integer(pdClean$t180)
 pdClean$t225 <- as.integer(pdClean$t225)
-pdClean$nest_age <- as.integer(pdClean$nest_age) #warning here is ok--NAs are replacing "pred" and "" values
+pdClean$nest_age <- as.integer(pdClean$nest_age) 
 
+#warning here is ok--NAs are replacing "pred" and "" values
 
 ```
 
@@ -645,24 +650,6 @@ t.test(meanNest$HFSA_nestling, meanNest$MGSA_nestling)
 
 ```
 
-
-# Prey Deliveries by Year
-
-Going to create a similar graph but with years on the x-axis. I will sum values from time = 15 through time = 60 and only use this data from the first hour of each night.
-
-```{r eval=FALSE, include=FALSE}
-# Select relevant columns and mutate to sum PDs in first hour
-pdHour1 <- pdClean %>%
-  dplyr::select(study_site, year, nest_age, t15, t30, t45, t60)
-
-pdNoNA <- na.omit(pdHour1)  
-
-# Delete rows with all NAs
-pdHour1 <- 
-  rowwise() %>%
-  mutate("hour1" = sum(c(t15, t30, t45, t60)))
-
-```
 
 
 # References
