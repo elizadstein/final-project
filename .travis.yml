@@ -1,7 +1,5 @@
 language: r
 os: linux
-cache: packages
-sudo: required
 dist: xenial
 r:
   - oldrel
@@ -9,9 +7,7 @@ r:
   - devel
 
 before_install:
-  - sudo add-apt-repository ppa:ubuntugis/ppa --yes
-  - sudo apt-get --yes --force-yes update -qq
-  - sudo apt-get install --yes libudunits2-dev libproj-dev libgeos-dev libgdal-dev
+  - R -e 'install.packages("rgdal", repos=c("http://R-Forge.R-project.org", "http://cran.rstudio.com"))'
 
 script:
   - R -e "source('tests/testthat.R')"
