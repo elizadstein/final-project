@@ -27,7 +27,6 @@ All relative paths begin at the final-project repository root directory.
 # Data manipulation and visualization
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
 install.packages("gridExtra", repos='http://cran.us.r-project.org')
-install.packages("pandoc", repos='http://cran.us.r-project.org')
 
 ```
 
@@ -44,7 +43,7 @@ install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 # Data manipulation and visualization
 library(tidyverse)
 library(gridExtra)
-library(pandoc)
+
 ```
 
 ```{r eval=FALSE, include=FALSE}
