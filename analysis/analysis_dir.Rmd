@@ -9,8 +9,6 @@ author: "Eliza Stein"
 date: "11/8/2020"
 bibliography: references.bib
 csl: './apa.csl'
-editor_options:
-  chunk_output_type: console
 ---
 
 # Introduction
@@ -24,6 +22,13 @@ Here, I examine one possible explanation for increased mortality in HFSA: prey a
 # Initialization
 
 All relative paths begin at the final-project repository root directory.
+
+## Directories
+```{r setup}
+  library(knitr)
+  opts_knit$set(root.dir=normalizePath('../final-project'))
+
+```
 
 ## Required Packages
 
@@ -70,8 +75,11 @@ library(RColorBrewer)
 
 ## Working directory:
 
-```{r}
-knitr::
+```{r eval=FALSE, include=FALSE}
+library(knitr)
+opts_knit$set(base.dir = './figures') # Change the base dir where to save figures
+knit2html("./docs/report.Rmd", "./docs/report.html")
+
 #setwd("~/final-project/")
 
 ```
@@ -404,9 +412,12 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
 
 
 Plot both as separate plots, side by side:
-```{r}
+```{r}  
 
-grid.arrange(plotInc_sex, plotNest_sex)
+pdf("analysis/figures/pds_by_sex.pdf") # starts writing a PDF to file
+grid.arrange(plotInc_sex, plotNest_sex)                  # makes the actual plot
+dev.off()                     # closes the PDF file
+
 
 ```
 
