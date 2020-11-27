@@ -29,7 +29,7 @@ All relative paths begin at the final-project repository root directory.
 
 ```{r}
 # LaTex
-tinytex::install_tinytex()
+install.packages("tinytex")
 
 # Data manipulation and visualization
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
@@ -47,6 +47,10 @@ install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 ```
 
 ```{r}
+# LaTex
+library(tinytex)
+tinytex::install_tinytex()
+
 # Data manipulation and visualization
 library(tidyverse)
 library(gridExtra)

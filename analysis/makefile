@@ -1,4 +1,4 @@
-analysis: pd_analysis.Rmd
+manuscript: pd_analysis.Rmd
 	Rscript -e 'rmarkdown::render("pd_analysis.Rmd")'
 
 clean:
