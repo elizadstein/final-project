@@ -4,7 +4,7 @@ output:
     citation_package: natbib
     keep_tex: false
     latex_engine: xelatex
-title: "Prey Delivery Rates in Disturbed Environment"
+title: "Nest Provisioning in a Fire Disturbed Landscape"
 author: "Eliza Stein"
 date: "11/8/2020"
 bibliography: references.bib
@@ -189,7 +189,7 @@ Load prey delivery data.
 
 getwd()
 
-pdOriginal <- read.csv("../data/pd_main.csv")
+pdOriginal <- read.csv("./data/pd_main.csv")
 
 
 #rename the first column, which imported with a special character
