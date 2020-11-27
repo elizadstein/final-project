@@ -29,7 +29,7 @@ All relative paths begin at the final-project repository root directory.
 
 ```{r}
 # LaTex
-install.packages("tinytex")
+#install.packages("tinytex")
 
 # Data manipulation and visualization
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
@@ -68,6 +68,15 @@ library(RColorBrewer)
 
 ```
 
+## Working directory:
+
+```{r}
+knitr::
+#setwd("~/final-project/")
+
+```
+
+
 ## Custom functions:
 
 ```{r}
@@ -102,7 +111,7 @@ Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N.
 ```{r eval=FALSE, include=FALSE}
 
 # Load Boundary
-boundary_sf <- st_read("./analysis/images/hayman.shp")
+boundary_sf <- st_read("../analysis/images/hayman.shp")
 
 # Get extent
 ext <- st_bbox(boundary_sf)
@@ -115,7 +124,7 @@ Load in fire severity raster data:
 ```{r eval=FALSE, include=FALSE}
 
 # Load raster image
-severity <- raster("./analysis/images/burn_severity/burn_severity.adf")
+severity <- raster("../analysis/images/burn_severity/burn_severity.adf")
 
 # Change boundary shapefile class from `sf` to `spatial`
 boundary_sp <- as(boundary_sf, "Spatial")
@@ -155,7 +164,7 @@ Plot nest locations (n = 45) on Hayman Fire severity map:
 
 ```{r eval=FALSE, include=FALSE}
 # Read in nest tree data
-nest_dat <- read.csv("./data/nest_trees.csv")
+nest_dat <- read.csv("../data/nest_trees.csv")
 
 # Plot nest trees over Hayman burn map
 sev_bound_plot +
@@ -187,7 +196,6 @@ Load prey delivery data.
 
 ```{r}
 
-getwd()
 
 pdOriginal <- read.csv("./data/pd_main.csv")
 

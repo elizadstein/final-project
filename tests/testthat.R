@@ -1,8 +1,12 @@
 install.packages('knitr')
 install.packages('testthat')
+install.packages("tinytex")
 
 library(knitr)
 library(testthat)
+library(tinytex)
+tinytex::install_tinytex()
+
 
 
 knitr::knit('analysis/pd_analysis.Rmd', tangle=TRUE)
