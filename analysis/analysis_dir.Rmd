@@ -1,34 +1,15 @@
 ---
 output:
-  pdf_document:
-    citation_package: natbib
-    keep_tex: false
-    latex_engine: xelatex
+  pdf_document
 title: "Nest Provisioning in a Fire Disturbed Landscape"
 author: "Eliza Stein"
 date: "11/8/2020"
-bibliography: references.bib
-csl: './apa.csl'
+
 ---
-
-# Introduction
-
-Fire plays an important role as a consistent disturbance in maintaining open stands of old-growth Ponderosa Pine (*Pinus ponderosa*) forests by helping to eliminate understory and limit fuel loads [@veblen2000climatic]. Before human intervention, Ponderosa Pine forests naturally underwent forest fires in 5-50 year intervals [@veblen2000climatic]. Over the past century, however, tree planting initiatives and increased implementation of fire suppression have led to increased density of stands [@griffis2001understory], making forest stands that are already drought stressed even more susceptible to high severity crown fires [@veblen2000climatic]. In 2002, a human-caused wildfire, the Hayman Fire, burned 138,000 acres of old-growth Ponderosa pine forests in Colorado's Pike National Forest [@graham2003hayman]. 
-
-The Flammulated Owl (*Psiloscops flammeolus*) is a territorial, insectivorous, and nocturnal raptor native to montane forests in portions of the Rocky Mountains, Sierra Nevada Mountains, and the Occidental Mountains [@linkhart2013flammulated]. The diet of the owl primarily consists of moths native to these regions [@linkhart2013flammulated]. As a highly specialized secondary cavity nesting raptor, the Flammulated Owl is deemed an indicator species, meaning that the health of an ecosystem can be estimated based on the health of their population. Survival models have shown that Flammulated Owl survival in the HFSA is currently lower than survival in MGSA, suggesting that mortality, rather than emigration, explains most of the population declines following the Hayman Fire (Linkhart and Yanco, unpublished data).
-
-Here, I examine one possible explanation for increased mortality in HFSA: prey availability. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources [@nappi2010effect]. If Flammulated Owls are adapting their behavior in response to changing prey availability, I would expect that the rate of prey deliveries to active nests would increase or decrease (increase if prey is lower quality, decrease if prey is more scarce or difficult to detect) [@zarybnicka2009tengmalm]. If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which do not occupy landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes.
 
 # Initialization
 
 All relative paths begin at the final-project repository root directory.
-
-## Directories
-```{r setup}
-  library(knitr)
-  opts_knit$set(root.dir=normalizePath('../final-project'))
-
-```
 
 ## Required Packages
 
@@ -73,17 +54,6 @@ library(RColorBrewer)
 
 ```
 
-## Working directory:
-
-```{r eval=FALSE, include=FALSE}
-library(knitr)
-opts_knit$set(base.dir = './figures') # Change the base dir where to save figures
-knit2html("./docs/report.Rmd", "./docs/report.html")
-
-#setwd("~/final-project/")
-
-```
-
 
 ## Custom functions:
 
@@ -108,96 +78,6 @@ getCI <- function(vec, n_samp=1000) {
 }
 
 ```
-
-
-# Study Area
-
-## Hayman Fire Study Area (HFSA)
-
-Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N. 
-
-```{r eval=FALSE, include=FALSE}
-
-# Load Boundary
-boundary_sf <- st_read("../analysis/images/hayman.shp")
-
-# Get extent
-ext <- st_bbox(boundary_sf)
-
-```
-
-
-Load in fire severity raster data:
-
-```{r eval=FALSE, include=FALSE}
-
-# Load raster image
-severity <- raster("../analysis/images/burn_severity/burn_severity.adf")
-
-# Change boundary shapefile class from `sf` to `spatial`
-boundary_sp <- as(boundary_sf, "Spatial")
-
-# Use fire boundary to crop fire severity raster
-severity_crop <- raster::crop(severity, boundary_sp)
-
-# Then mask by actual polygon
-severity_crop <- raster::mask(severity_crop, boundary_sp)
-
-# Convert to df
-severity_df <- raster::as.data.frame(severity_crop, xy = TRUE)
-
-# Remove red hole in middle
-severity_df$burn_severity[severity_df$burn_severity == 6] <- NA
-
-# Plot severity
-fire_colors <- rev(brewer.pal(n = 7, "RdYlGn")) %>%
-  colorRampPalette()
-
-severity_plot <- ggplot() +
-  geom_raster(data = severity_df, aes(x = x, y = y, 
-    fill = burn_severity)) +
-  scale_fill_gradientn(name = "Burn Severity", colors = fire_colors(7), na.value = "white") +
-  theme_void()
-
-# Plot severity with boundary overlay
-sev_bound_plot <- severity_plot + 
-  geom_sf(data = boundary_sf, size = 1, color = "black", fill = NA) +
-  coord_sf() +
-  theme_void()
-
-```
-
-
-Plot nest locations (n = 45) on Hayman Fire severity map:
-
-```{r eval=FALSE, include=FALSE}
-# Read in nest tree data
-nest_dat <- read.csv("../data/nest_trees.csv")
-
-# Plot nest trees over Hayman burn map
-sev_bound_plot +
-  geom_point(data = nest_dat, mapping = aes(x = x_coord, y = y_coord), color = "red") +
-  ggtitle("Hayman Fire Nest Sites") +
-  theme_void() +
-  theme(plot.title = element_text(hjust = 0.5))
-
-
-```
-
-
-Plot Hayman over CO basemap (maybe remove):
-
-```{r eval=FALSE, include=FALSE}
-# Get extent of Hayman from shapefile
-st_bbox(boundary_sf)
-
-co_basemap <- get_map(location=c(left = -46.18558, bottom = 43.156723, right = -49.08987, top = 43.524593), zoom=11, maptype = 'terrain-background', source = 'stamen')
-
-
-plot(co_basemap)
-```
-
-
 # Prey Delivery Rates by Sex
 
 Load prey delivery data.
@@ -205,7 +85,7 @@ Load prey delivery data.
 ```{r}
 
 
-pdOriginal <- read.csv("./data/pd_main.csv")
+pdOriginal <- read.csv("../data/pd_main.csv")
 
 
 #rename the first column, which imported with a special character
@@ -414,7 +294,7 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
 Plot both as separate plots, side by side:
 ```{r}  
 
-pdf("analysis/figures/pds_by_sex.pdf")    # creates new pd file
+pdf("../analysis/figures/figure1")    # creates new pd file
 grid.arrange(plotInc_sex, plotNest_sex)   # makes the actual plot
 dev.off()     # closes the PDF file
 
@@ -661,8 +541,8 @@ plotAll <- ggplot(data = ciAll) +
 Plot both as separate plots, side by side:
 ```{r}
 
-pdf("analysis/figures/pds_by_site.pdf")    # creates new pd file
-grid.arrange(grid.arrange(plotInc, plotNest))  # makes the actual plot
+pdf("../analysis/figures/figure2")    # creates new pd file
+grid.arrange(plotInc, plotNest) # makes the actual plot
 dev.off()     # closes the PDF file
 
 ```

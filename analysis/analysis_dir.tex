@@ -1,0 +1,870 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+  \usepackage{amssymb}
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Nest Provisioning in a Fire Disturbed Landscape},
+  pdfauthor={Eliza Stein},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Nest Provisioning in a Fire Disturbed Landscape}
+\author{Eliza Stein}
+\date{11/8/2020}
+
+\begin{document}
+\maketitle
+
+\hypertarget{initialization}{%
+\section{Initialization}\label{initialization}}
+
+All relative paths begin at the final-project repository root directory.
+
+\hypertarget{required-packages}{%
+\subsection{Required Packages}\label{required-packages}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# LaTex}
+\CommentTok{\#install.packages("tinytex")}
+
+\CommentTok{\# Data manipulation and visualization}
+\FunctionTok{install.packages}\NormalTok{(}\StringTok{"tidyverse"}\NormalTok{, }\AttributeTok{repos=}\StringTok{\textquotesingle{}http://cran.us.r{-}project.org\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Installing package into '/home/eliza/R/x86_64-pc-linux-gnu-library/4.0'
+## (as 'lib' is unspecified)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{install.packages}\NormalTok{(}\StringTok{"gridExtra"}\NormalTok{, }\AttributeTok{repos=}\StringTok{\textquotesingle{}http://cran.us.r{-}project.org\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Installing package into '/home/eliza/R/x86_64-pc-linux-gnu-library/4.0'
+## (as 'lib' is unspecified)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# LaTex}
+\CommentTok{\#library(tinytex)}
+\CommentTok{\#tinytex::install\_tinytex()}
+
+\CommentTok{\# Data manipulation and visualization}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.3.2     v purrr   0.3.4
+## v tibble  3.0.4     v dplyr   1.0.2
+## v tidyr   1.1.2     v stringr 1.4.0
+## v readr   1.4.0     v forcats 0.5.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(gridExtra)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'gridExtra'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
+\end{verbatim}
+
+\hypertarget{custom-functions}{%
+\subsection{Custom functions:}\label{custom-functions}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} getCI}
+\CommentTok{\#\textquotesingle{} }
+\CommentTok{\#\textquotesingle{} @param vec a vector}
+\CommentTok{\#\textquotesingle{} @param n\_samp number of times to sample data}
+\CommentTok{\#\textquotesingle{}}
+\CommentTok{\#\textquotesingle{} @return upper and lower bootstrap confidence intervals}
+\CommentTok{\#\textquotesingle{} }
+\CommentTok{\#\textquotesingle{}}
+\CommentTok{\#\textquotesingle{} @examples}
+\CommentTok{\#\textquotesingle{}    getCI(1:20, 2000)}
+\CommentTok{\#\textquotesingle{} @export}
+
+\NormalTok{getCI }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(vec, }\AttributeTok{n\_samp=}\DecValTok{1000}\NormalTok{) \{}
+\NormalTok{  smp }\OtherTok{\textless{}{-}} \FunctionTok{replicate}\NormalTok{(n\_samp, }\FunctionTok{mean}\NormalTok{(}\FunctionTok{sample}\NormalTok{(vec, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  CIs }\OtherTok{\textless{}{-}}\FunctionTok{quantile}\NormalTok{(smp, }\FunctionTok{c}\NormalTok{(}\FloatTok{0.025}\NormalTok{, }\FloatTok{0.975}\NormalTok{), }\AttributeTok{na.rm =}\NormalTok{ T)}
+  \FunctionTok{return}\NormalTok{(CIs)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{prey-delivery-rates-by-sex}{%
+\section{Prey Delivery Rates by Sex}\label{prey-delivery-rates-by-sex}}
+
+Load prey delivery data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pdOriginal }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"../data/pd\_main.csv"}\NormalTok{)}
+
+
+\CommentTok{\#rename the first column, which imported with a special character}
+\FunctionTok{names}\NormalTok{(pdOriginal)[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"nest"}
+\end{Highlighting}
+\end{Shaded}
+
+Filter to only include M and F (remove unknown and total), separate
+``nest'' column into "study\_site' and territory.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pdMF }\OtherTok{\textless{}{-}}\NormalTok{ pdOriginal }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{separate}\NormalTok{(}\AttributeTok{col =}\NormalTok{ nest, }\AttributeTok{into =} \FunctionTok{c}\NormalTok{(}\StringTok{"study\_site"}\NormalTok{, }\StringTok{"territory"}\NormalTok{), }\AttributeTok{sep =} \DecValTok{1}\NormalTok{, }\AttributeTok{remove =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(sex }\SpecialCharTok{==} \StringTok{"M"} \SpecialCharTok{|}\NormalTok{ sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Check structure of data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pd\_str }\OtherTok{\textless{}{-}} \FunctionTok{str}\NormalTok{(pdMF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    1299 obs. of  55 variables:
+##  $ study_site       : chr  "A" "A" "B" "C" ...
+##  $ territory        : chr  "29_2007" "29_2007" "7_2005" "S1_1_2005" ...
+##  $ year             : int  2007 2007 2005 2005 2005 2005 2006 2006 2014 2004 ...
+##  $ obs_date         : chr  "6/4/2007" "6/4/2007" "6/15/2005" "6/9/2005" ...
+##  $ clutch_size      : chr  "2" "2" "" "" ...
+##  $ brood_size       : chr  "2" "2" "" "" ...
+##  $ num_fledged      : chr  "2" "2" "" "" ...
+##  $ incubation_start : chr  "6/6/2007" "6/6/2007" "" "" ...
+##  $ julian_incubation: int  157 157 NA NA NA NA 157 157 155 151 ...
+##  $ nest_age         : chr  "1" "1" "1" "1" ...
+##  $ sunset           : int  2021 2021 NA 2025 2023 2020 2023 2023 2026 2019 ...
+##  $ sex              : chr  "M" "F" "F" "F" ...
+##  $ t15              : int  NA NA 0 NA NA NA NA NA 2 NA ...
+##  $ t30              : int  NA NA 0 NA NA NA NA NA NA 0 ...
+##  $ t45              : int  NA NA 0 NA 0 NA NA NA NA 2 ...
+##  $ t60              : int  NA NA 0 NA 0 NA NA NA NA 1 ...
+##  $ t75              : int  NA NA 0 NA 0 NA 1 0 NA 3 ...
+##  $ t90              : int  NA NA NA 0 0 NA 0 0 NA 0 ...
+##  $ t105             : int  NA NA NA 0 0 0 0 0 NA 0 ...
+##  $ t120             : int  NA NA NA 0 NA 0 0 0 NA 0 ...
+##  $ t135             : int  NA NA NA 0 NA 0 0 0 NA NA ...
+##  $ t150             : int  NA NA NA 0 NA 0 1 0 NA NA ...
+##  $ t165             : int  NA NA NA NA NA 0 0 0 NA NA ...
+##  $ t180             : chr  "1" "0" "" "" ...
+##  $ t195             : int  3 0 NA NA NA NA NA NA NA NA ...
+##  $ t210             : int  2 0 NA NA NA NA NA NA NA NA ...
+##  $ t225             : chr  "1" "0" "" "" ...
+##  $ t240             : int  3 0 NA NA NA NA NA NA NA NA ...
+##  $ t255             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t270             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t285             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t300             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t315             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t330             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t345             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t360             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t375             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t390             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t405             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t420             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t435             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t450             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t465             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t480             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t495             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t510             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t525             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ t540             : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Comments         : chr  "passive" "passive" "Captured on Last Pd" "Capture F, start time reflects when she goes back on, then capture attempt on M, F begging from last PD till end" ...
+##  $ obs_time         : chr  "2313-2418" "2313-2418" "2015-2128" "2150-2254" ...
+##  $ start_time       : chr  "23:13" "23:13" "20:15" "21:50" ...
+##  $ stop_time        : chr  "24:18:00" "24:18:00" "21:28" "22:54" ...
+##  $ weather          : chr  "sprinkles, light wind" "sprinkles, light wind" "storm entering around 2105, but doesn't start until after observations" "periods of showers" ...
+##  $ fledge_date      : chr  "" "" "" "" ...
+##  $ fledge_accuracy  : chr  "w/in 1 day" "w/in 1 day" "Predated" "abandoned" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(pdMF}\SpecialCharTok{$}\NormalTok{t180) }\CommentTok{\#at least one cell has an asterisk after the value}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "1"  "0"  ""   "4"  "4*" "2"  "9"  "10" "3"  "5"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(pdMF}\SpecialCharTok{$}\NormalTok{t225) }\CommentTok{\#same here}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "1"  "0"  ""   "6*" "3"  "2"  "8"  "11" "7"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(pdMF}\SpecialCharTok{$}\NormalTok{nest\_age) }\CommentTok{\#"pred" and "" can be converted to NA}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "1"    "2"    "3"    "4"    "5"    "6"    "7"    "8"    "9"    "10"  
+## [11] "11"   "12"   "13"   "14"   "15"   "16"   "17"   "18"   "19"   "20"  
+## [21] "21"   "22"   "23"   "24"   "25"   "26"   "27"   "28"   "29"   "30"  
+## [31] "31"   "32"   "33"   "34"   "35"   "36"   "37"   "38"   "39"   "40"  
+## [41] "41"   "42"   "43"   "44"   "45"   "46"   "47"   "48"   "49"   "50"  
+## [51] "51"   "53"   "100"  "0"    "pred" ""
+\end{verbatim}
+
+Fix structure.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#remove asterisks}
+\NormalTok{pdClean }\OtherTok{\textless{}{-}}\NormalTok{ pdMF }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{t180 =} \FunctionTok{gsub}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{*"}\NormalTok{, }\StringTok{""}\NormalTok{, t180)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{t225 =} \FunctionTok{gsub}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{*"}\NormalTok{, }\StringTok{""}\NormalTok{, t225))}
+
+
+\CommentTok{\#change these columns to numeric}
+\NormalTok{pdClean}\SpecialCharTok{$}\NormalTok{t180 }\OtherTok{\textless{}{-}} \FunctionTok{as.integer}\NormalTok{(pdClean}\SpecialCharTok{$}\NormalTok{t180)}
+\NormalTok{pdClean}\SpecialCharTok{$}\NormalTok{t225 }\OtherTok{\textless{}{-}} \FunctionTok{as.integer}\NormalTok{(pdClean}\SpecialCharTok{$}\NormalTok{t225)}
+\NormalTok{pdClean}\SpecialCharTok{$}\NormalTok{nest\_age }\OtherTok{\textless{}{-}} \FunctionTok{as.integer}\NormalTok{(pdClean}\SpecialCharTok{$}\NormalTok{nest\_age) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: NAs introduced by coercion
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#warning here is ok{-}{-}NAs are replacing "pred" and "" values}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{prey-deliveries-throughout-night}{%
+\subsection{Prey Deliveries Throughout
+Night}\label{prey-deliveries-throughout-night}}
+
+Data was separated by sex (M vs.~F) and by incubation vs.~nestling
+stage. Nestling period is defined as nest\_age \textgreater= 22 days. If
+nest age was not indicated in original dataset, field notes were used to
+determine whether nest was in incubation (all eggs) or nestling (at
+least one nestling) stage. For these records, the following values were
+manually input: nest\_age = 0 for incubation or nest\_age = 100 for
+nestling, so that this data could be easily separated from known nest
+age. If it was later determined that nest had been predated before
+observation, ``pred'' was entered. If the nest stage could not be
+determined, it was left blank.``pred'' and "" values were converted to
+NA earlier when this column was converted to numeric.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Create independent dfs for M (nestling and incubation stage) and F (nestling and incubation state). }
+
+\CommentTok{\#select relevant columns, add column for stage, rename study sites, drop NAs}
+\NormalTok{pdStage1 }\OtherTok{\textless{}{-}}\NormalTok{ pdClean }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(sex, nest\_age, t15}\SpecialCharTok{:}\NormalTok{t240) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{stage =}
+      \FunctionTok{ifelse}\NormalTok{(nest\_age }\SpecialCharTok{\textless{}} \DecValTok{22}\NormalTok{, }\StringTok{"incubation"}\NormalTok{, }\StringTok{"nestling"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{drop\_na}\NormalTok{(stage)}
+
+\CommentTok{\#change column names to remove "t" in front of time interval}
+\FunctionTok{colnames}\NormalTok{(pdStage1) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"sex"}\NormalTok{, }\StringTok{"nest\_age"}\NormalTok{, }\StringTok{"15"}\NormalTok{, }\StringTok{"30"}\NormalTok{, }\StringTok{"45"}\NormalTok{, }\StringTok{"60"}\NormalTok{, }\StringTok{"75"}\NormalTok{, }\StringTok{"90"}\NormalTok{, }\StringTok{"105"}\NormalTok{, }\StringTok{"120"}\NormalTok{, }\StringTok{"135"}\NormalTok{, }\StringTok{"150"}\NormalTok{, }\StringTok{"165"}\NormalTok{, }\StringTok{"180"}\NormalTok{, }\StringTok{"195"}\NormalTok{, }\StringTok{"210"}\NormalTok{, }\StringTok{"225"}\NormalTok{, }\StringTok{"240"}\NormalTok{, }\StringTok{"stage"}\NormalTok{)}
+
+\CommentTok{\#create independent dfs for each study site and stage}
+\NormalTok{pdM\_inc }\OtherTok{\textless{}{-}}\NormalTok{ pdStage1 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(sex }\SpecialCharTok{==}\StringTok{"M"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"incubation"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{pdM\_nest }\OtherTok{\textless{}{-}}\NormalTok{ pdStage1 }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(sex }\SpecialCharTok{==}\StringTok{"M"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"nestling"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{pdF\_inc }\OtherTok{\textless{}{-}}\NormalTok{ pdStage1 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(sex }\SpecialCharTok{==}\StringTok{"F"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"incubation"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+         
+\NormalTok{pdF\_nest }\OtherTok{\textless{}{-}}\NormalTok{ pdStage1 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(sex }\SpecialCharTok{==}\StringTok{"F"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"nestling"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{mean-pd-tables}{%
+\subsection{Mean PD tables}\label{mean-pd-tables}}
+
+Four stand-alone data.frames, one for M (incubation), one for M
+(nestling), one for F (incubation), and one for F (nestling):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{meanM\_inc }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdM\_inc)),}
+  \AttributeTok{M\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdM\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+
+\NormalTok{meanM\_nest }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdM\_nest)),}
+  \AttributeTok{M\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdM\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+
+\NormalTok{meanF\_inc }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdF\_inc)),}
+  \AttributeTok{F\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdF\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+
+\NormalTok{meanF\_nest }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdF\_nest)),}
+  \AttributeTok{F\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdF\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+One table showing mean PDs for all study sites and stages:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{meanMF }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdM\_inc)),}
+  \AttributeTok{M\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdM\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{M\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdM\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{F\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdF\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{F\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdF\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{calculate-confidence-intervals}{%
+\subsection{Calculate confidence
+intervals}\label{calculate-confidence-intervals}}
+
+Write and apply function to obtain CIs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#now apply it across the columns of PD data}
+\NormalTok{ciM\_inc }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdM\_inc, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\NormalTok{ciM\_nest }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdM\_nest, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\NormalTok{ciF\_inc }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdF\_inc, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\NormalTok{ciF\_nest }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdF\_nest, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\end{Highlighting}
+\end{Shaded}
+
+Add CIs to a data frame. Remove rows where time \textgreater{} 180 for
+ciInc because no data is available for MGSA after this time.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ciInc\_sex }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{sex =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{"M"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanM\_inc)), }\FunctionTok{rep}\NormalTok{(}\StringTok{"F"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanF\_inc))),}
+    \AttributeTok{mean =} \FunctionTok{c}\NormalTok{(}\FunctionTok{colMeans}\NormalTok{(pdM\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\FunctionTok{colMeans}\NormalTok{(pdF\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)),}
+    \AttributeTok{ci\_l =} \FunctionTok{c}\NormalTok{(ciM\_inc[}\DecValTok{1}\NormalTok{,], ciF\_inc[}\DecValTok{1}\NormalTok{,]),}
+    \AttributeTok{ci\_h =} \FunctionTok{c}\NormalTok{(ciM\_inc[}\DecValTok{2}\NormalTok{,], ciF\_inc[}\DecValTok{2}\NormalTok{,]),}
+    \AttributeTok{time =} \FunctionTok{c}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanM\_inc)), }\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanF\_inc))),}
+    \AttributeTok{stage =} \StringTok{"Incubation"}\NormalTok{)}
+
+
+\NormalTok{ciNest\_sex }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{sex =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{"M"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanM\_nest)), }\FunctionTok{rep}\NormalTok{(}\StringTok{"F"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanF\_nest))),}
+    \AttributeTok{mean =} \FunctionTok{c}\NormalTok{(}\FunctionTok{colMeans}\NormalTok{(pdM\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\FunctionTok{colMeans}\NormalTok{(pdF\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)),}
+    \AttributeTok{ci\_l =} \FunctionTok{c}\NormalTok{(ciM\_nest[}\DecValTok{1}\NormalTok{,], ciF\_nest[}\DecValTok{1}\NormalTok{,]),}
+    \AttributeTok{ci\_h =} \FunctionTok{c}\NormalTok{(ciM\_nest[}\DecValTok{2}\NormalTok{,], ciF\_nest[}\DecValTok{2}\NormalTok{,]),}
+    \AttributeTok{time =} \FunctionTok{c}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanM\_nest)), }\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanF\_nest))),}
+    \AttributeTok{stage =} \StringTok{"Nestling"}\NormalTok{)}
+    
+\NormalTok{ciAll\_sex }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(ciInc\_sex, ciNest\_sex)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{plot}{%
+\subsection{Plot}\label{plot}}
+
+Incubation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotInc\_sex }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ciInc\_sex) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ sex, }\AttributeTok{group =}\NormalTok{ sex),}
+             \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{ymax =}\NormalTok{ ci\_h, }\AttributeTok{ymin=}\NormalTok{ci\_l, }\AttributeTok{color =}\NormalTok{ sex, }
+                    \AttributeTok{group =}\NormalTok{ sex),}
+                \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Time After Sunset (minutes)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Mean Prey Deliveries"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Incubation"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Sex"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Nestling:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotNest\_sex }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ciNest\_sex) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ sex, }\AttributeTok{group =}\NormalTok{ sex),}
+             \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{ymax =}\NormalTok{ ci\_h, }\AttributeTok{ymin=}\NormalTok{ci\_l, }\AttributeTok{color =}\NormalTok{ sex, }
+                    \AttributeTok{group =}\NormalTok{ sex),}
+                \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Time After Sunset (minutes)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Mean Prey Deliveries"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Nestling"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Sex"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Plot both as separate plots, side by side:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pdf}\NormalTok{(}\StringTok{"../analysis/figures/figure1"}\NormalTok{)    }\CommentTok{\# creates new pd file}
+\FunctionTok{grid.arrange}\NormalTok{(plotInc\_sex, plotNest\_sex)   }\CommentTok{\# makes the actual plot}
+\FunctionTok{dev.off}\NormalTok{()     }\CommentTok{\# closes the PDF file}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\hypertarget{test-for-difference}{%
+\subsection{Test for Difference}\label{test-for-difference}}
+
+Independent t-test for incubation stage. p = 5.163e-09
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(meanF\_inc}\SpecialCharTok{$}\NormalTok{F\_incubation, meanM\_inc}\SpecialCharTok{$}\NormalTok{M\_incubation)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Welch Two Sample t-test
+## 
+## data:  meanF_inc$F_incubation and meanM_inc$M_incubation
+## t = -11.795, df = 15.078, p-value = 5.163e-09
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.1125110 -0.7720969
+## sample estimates:
+##   mean of x   mean of y 
+## 0.004058442 0.946362390
+\end{verbatim}
+
+Independent t-test for nestling stage. p = 1.355e-08
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(meanF\_nest}\SpecialCharTok{$}\NormalTok{F\_nestling, meanM\_nest}\SpecialCharTok{$}\NormalTok{M\_nestling)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Welch Two Sample t-test
+## 
+## data:  meanF_nest$F_nestling and meanM_nest$M_nestling
+## t = -8.0503, df = 26.534, p-value = 1.355e-08
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.2074419 -0.7166369
+## sample estimates:
+## mean of x mean of y 
+## 0.3543829 1.3164223
+\end{verbatim}
+
+\hypertarget{prey-delivery-rates-by-site}{%
+\section{Prey Delivery Rates by
+Site}\label{prey-delivery-rates-by-site}}
+
+Filter pdMF to only include males in B (MGSA) and C (HFSA).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pdHM }\OtherTok{\textless{}{-}}\NormalTok{ pdClean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(study\_site }\SpecialCharTok{==} \StringTok{"B"} \SpecialCharTok{|}\NormalTok{ study\_site }\SpecialCharTok{==} \StringTok{"C"}\NormalTok{, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{visualize-prey-deliveries-throughout-night}{%
+\subsection{Visualize prey deliveries throughout
+night}\label{visualize-prey-deliveries-throughout-night}}
+
+Data was separated by study site (HFSA vs.~MGSA) and by incubation
+vs.~nestling stage.
+
+since the last observation for HFSA is at time = 240, we'll end both
+datasets there.
+
+First, create data frame with PDs for whole dataset, then broken down by
+each study site and stage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#create independet dfs for HFSA (nestling and incubation stage) and MGSA (nestling and incubation state). }
+
+\CommentTok{\#select relevant columns, add column for stage, rename study sites, drop NAs}
+\NormalTok{pdStage }\OtherTok{\textless{}{-}}\NormalTok{ pdClean }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(study\_site, nest\_age, t15}\SpecialCharTok{:}\NormalTok{t240) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{stage =}
+      \FunctionTok{ifelse}\NormalTok{(nest\_age }\SpecialCharTok{\textless{}} \DecValTok{22}\NormalTok{, }\StringTok{"incubation"}\NormalTok{, }\StringTok{"nestling"}\NormalTok{),}
+    \AttributeTok{study\_site =}
+      \FunctionTok{ifelse}\NormalTok{(study\_site }\SpecialCharTok{==} \StringTok{"B"}\NormalTok{, }\StringTok{"MGSA"}\NormalTok{, }\StringTok{"HFSA"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{drop\_na}\NormalTok{(stage)}
+
+\CommentTok{\#change column names to remove "t" in front of time interval}
+\FunctionTok{colnames}\NormalTok{(pdStage) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"study\_site"}\NormalTok{, }\StringTok{"nest\_age"}\NormalTok{, }\StringTok{"15"}\NormalTok{, }\StringTok{"30"}\NormalTok{, }\StringTok{"45"}\NormalTok{, }\StringTok{"60"}\NormalTok{, }\StringTok{"75"}\NormalTok{, }\StringTok{"90"}\NormalTok{, }\StringTok{"105"}\NormalTok{, }\StringTok{"120"}\NormalTok{, }\StringTok{"135"}\NormalTok{, }\StringTok{"150"}\NormalTok{, }\StringTok{"165"}\NormalTok{, }\StringTok{"180"}\NormalTok{, }\StringTok{"195"}\NormalTok{, }\StringTok{"210"}\NormalTok{, }\StringTok{"225"}\NormalTok{, }\StringTok{"240"}\NormalTok{, }\StringTok{"stage"}\NormalTok{)}
+
+\CommentTok{\#create independent dfs for each study site and stage}
+\NormalTok{pdHFSA\_inc }\OtherTok{\textless{}{-}}\NormalTok{ pdStage }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(study\_site }\SpecialCharTok{==}\StringTok{"HFSA"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"incubation"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{pdHFSA\_nest }\OtherTok{\textless{}{-}}\NormalTok{ pdStage }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(study\_site }\SpecialCharTok{==}\StringTok{"HFSA"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"nestling"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{pdMGSA\_inc }\OtherTok{\textless{}{-}}\NormalTok{ pdStage }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(study\_site }\SpecialCharTok{==}\StringTok{"MGSA"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"incubation"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+         
+\NormalTok{pdMGSA\_nest }\OtherTok{\textless{}{-}}\NormalTok{ pdStage }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(study\_site }\SpecialCharTok{==}\StringTok{"MGSA"}\NormalTok{, stage }\SpecialCharTok{==} \StringTok{"nestling"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{\textquotesingle{}15\textquotesingle{}}\SpecialCharTok{:}\StringTok{\textquotesingle{}240\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{mean-pd-tables-1}{%
+\subsection{Mean PD tables}\label{mean-pd-tables-1}}
+
+Four stand-alone data.frames, one for (incubation), one for HFSA
+(nestling), one for MGSA(incubation), and one for MGSA (nestling):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{meanHFSA\_inc }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdHFSA\_inc)),}
+  \AttributeTok{HFSA\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdHFSA\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+
+\NormalTok{meanHFSA\_nest }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdHFSA\_nest)),}
+  \AttributeTok{HFSA\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdHFSA\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+
+\NormalTok{meanMGSA\_inc }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdMGSA\_inc)),}
+  \AttributeTok{MGSA\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdMGSA\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+
+\NormalTok{meanMGSA\_nest }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdMGSA\_nest)),}
+  \AttributeTok{MGSA\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdMGSA\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Two tables, one for nestling stage and one for incubation stage. This is
+just for visualization, not used in further analysis.
+
+One table showing mean PDs for all study sites and stages:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{meanAll }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(pdHFSA\_inc)),}
+  \AttributeTok{HFSA\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdHFSA\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{HFSA\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdHFSA\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{MGSA\_incubation =} \FunctionTok{colMeans}\NormalTok{(pdMGSA\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{MGSA\_nestling =} \FunctionTok{colMeans}\NormalTok{(pdMGSA\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{calculate-confidence-intervals-1}{%
+\subsection{Calculate confidence
+intervals}\label{calculate-confidence-intervals-1}}
+
+Write and apply function to obtain CIs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#now apply it across the columns of PD data}
+\NormalTok{ciHFSA\_inc }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdHFSA\_inc, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\NormalTok{ciHFSA\_nest }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdHFSA\_nest, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\NormalTok{ciMGSA\_inc }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdMGSA\_inc, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\NormalTok{ciMGSA\_nest }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(pdMGSA\_nest, }\DecValTok{2}\NormalTok{, }\AttributeTok{FUN =}\NormalTok{ getCI)}
+\end{Highlighting}
+\end{Shaded}
+
+Add CIs to a data frame. Remove rows where time \textgreater{} 180 for
+ciInc because no data is available for MGSA after this time.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ciInc }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(}
+  \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{study\_area =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{"HFSA"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanHFSA\_inc)), }\FunctionTok{rep}\NormalTok{(}\StringTok{"MGSA"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanMGSA\_inc))),}
+    \AttributeTok{mean =} \FunctionTok{c}\NormalTok{(}\FunctionTok{colMeans}\NormalTok{(pdHFSA\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\FunctionTok{colMeans}\NormalTok{(pdMGSA\_inc, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)),}
+    \AttributeTok{ci\_l =} \FunctionTok{c}\NormalTok{(ciHFSA\_inc[}\DecValTok{1}\NormalTok{,], ciMGSA\_inc[}\DecValTok{1}\NormalTok{,]),}
+    \AttributeTok{ci\_h =} \FunctionTok{c}\NormalTok{(ciHFSA\_inc[}\DecValTok{2}\NormalTok{,], ciMGSA\_inc[}\DecValTok{2}\NormalTok{,]),}
+    \AttributeTok{time =} \FunctionTok{c}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanHFSA\_inc)), }\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanMGSA\_inc))),}
+    \AttributeTok{stage =} \StringTok{"Incubation"}\NormalTok{),}
+\NormalTok{  time }\SpecialCharTok{\textless{}=} \DecValTok{180}\NormalTok{)}
+
+
+\NormalTok{ciNest }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{study\_area =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{"HFSA"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanHFSA\_nest)), }\FunctionTok{rep}\NormalTok{(}\StringTok{"MGSA"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(meanMGSA\_nest))),}
+    \AttributeTok{mean =} \FunctionTok{c}\NormalTok{(}\FunctionTok{colMeans}\NormalTok{(pdHFSA\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\FunctionTok{colMeans}\NormalTok{(pdMGSA\_nest, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)),}
+    \AttributeTok{ci\_l =} \FunctionTok{c}\NormalTok{(ciHFSA\_nest[}\DecValTok{1}\NormalTok{,], ciMGSA\_nest[}\DecValTok{1}\NormalTok{,]),}
+    \AttributeTok{ci\_h =} \FunctionTok{c}\NormalTok{(ciHFSA\_nest[}\DecValTok{2}\NormalTok{,], ciMGSA\_nest[}\DecValTok{2}\NormalTok{,]),}
+    \AttributeTok{time =} \FunctionTok{c}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanHFSA\_nest)), }\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(meanMGSA\_nest))),}
+    \AttributeTok{stage =} \StringTok{"Nestling"}\NormalTok{)}
+    
+\NormalTok{ciAll }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(ciInc, ciNest)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{plot-1}{%
+\subsection{Plot}\label{plot-1}}
+
+Incubation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotInc }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ciInc) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ study\_area, }\AttributeTok{group =}\NormalTok{ study\_area),}
+             \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{ymax =}\NormalTok{ ci\_h, }\AttributeTok{ymin=}\NormalTok{ci\_l, }\AttributeTok{color =}\NormalTok{ study\_area, }
+                    \AttributeTok{group =}\NormalTok{ study\_area),}
+                \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Time After Sunset (minutes)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Mean Prey Deliveries"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Incubation"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Study Area"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Nestling:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotNest }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ciNest) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ study\_area, }\AttributeTok{group =}\NormalTok{ study\_area),}
+             \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{ymax =}\NormalTok{ ci\_h, }\AttributeTok{ymin=}\NormalTok{ci\_l, }\AttributeTok{color =}\NormalTok{ study\_area, }
+                    \AttributeTok{group =}\NormalTok{ study\_area),}
+                \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Time After Sunset (minutes)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Mean Prey Deliveries"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Nestling"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Study Area"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Both:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotAll }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ciAll) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ study\_area, }\AttributeTok{group =}\NormalTok{ study\_area),}
+             \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{ymax =}\NormalTok{ ci\_h, }\AttributeTok{ymin=}\NormalTok{ci\_l, }\AttributeTok{color =}\NormalTok{ study\_area, }
+                    \AttributeTok{group =}\NormalTok{ study\_area),}
+                \AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(}\AttributeTok{width=}\FloatTok{0.75}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Time After Sunset (minutes)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Mean Prey Deliveries"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Average Prey Deliveries Throughout Night"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Study Area"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{facet\_grid}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ stage)}
+\end{Highlighting}
+\end{Shaded}
+
+Plot both as separate plots, side by side:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pdf}\NormalTok{(}\StringTok{"../analysis/figures/figure2"}\NormalTok{)    }\CommentTok{\# creates new pd file}
+\FunctionTok{grid.arrange}\NormalTok{(plotInc, plotNest) }\CommentTok{\# makes the actual plot}
+\FunctionTok{dev.off}\NormalTok{()     }\CommentTok{\# closes the PDF file}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\hypertarget{test-for-difference-1}{%
+\subsection{Test for Difference}\label{test-for-difference-1}}
+
+Independent t-tests for incubation stage. p = 0.8786
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(meanHFSA\_inc}\SpecialCharTok{$}\NormalTok{HFSA\_incubation, meanMGSA\_inc}\SpecialCharTok{$}\NormalTok{MGSA\_incubation)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Welch Two Sample t-test
+## 
+## data:  meanHFSA_inc$HFSA_incubation and meanMGSA_inc$MGSA_incubation
+## t = 0.4698, df = 21.664, p-value = 0.6432
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.1252531  0.1985364
+## sample estimates:
+## mean of x mean of y 
+## 0.4873974 0.4507558
+\end{verbatim}
+
+Independent t-tests for nestling stage. p = 0.377
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(meanHFSA\_nest}\SpecialCharTok{$}\NormalTok{HFSA\_nestling, meanMGSA\_nest}\SpecialCharTok{$}\NormalTok{MGSA\_nestling)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Welch Two Sample t-test
+## 
+## data:  meanHFSA_nest$HFSA_nestling and meanMGSA_nest$MGSA_nestling
+## t = 0.89919, df = 25.484, p-value = 0.377
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.1472872  0.3759510
+## sample estimates:
+## mean of x mean of y 
+## 0.9076640 0.7933321
+\end{verbatim}
+
+\end{document}

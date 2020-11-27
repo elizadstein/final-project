@@ -70,7 +70,7 @@ library(RColorBrewer)
 
 ## Working directory:
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 knitr::
 #setwd("~/final-project/")
 
