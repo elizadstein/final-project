@@ -414,9 +414,9 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
 Plot both as separate plots, side by side:
 ```{r}  
 
-pdf("analysis/figures/pds_by_sex.pdf") # starts writing a PDF to file
-grid.arrange(plotInc_sex, plotNest_sex)                  # makes the actual plot
-dev.off()                     # closes the PDF file
+pdf("analysis/figures/pds_by_sex.pdf")    # creates new pd file
+grid.arrange(plotInc_sex, plotNest_sex)   # makes the actual plot
+dev.off()     # closes the PDF file
 
 
 ```
@@ -661,7 +661,9 @@ plotAll <- ggplot(data = ciAll) +
 Plot both as separate plots, side by side:
 ```{r}
 
-grid.arrange(plotInc, plotNest)
+pdf("analysis/figures/pds_by_site.pdf")    # creates new pd file
+grid.arrange(grid.arrange(plotInc, plotNest))  # makes the actual plot
+dev.off()     # closes the PDF file
 
 ```
 
