@@ -10,4 +10,4 @@ r:
 install: skip
 
 script:
-  - R -e "source('tests/testthat.R')"
+  - R -e "source('tests/testthat2.R')"
