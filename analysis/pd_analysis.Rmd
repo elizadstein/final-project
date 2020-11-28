@@ -27,7 +27,7 @@ All relative paths begin at the final-project repository root directory.
 
 ## Required Packages
 
-```{r}
+```{r include=FALSE}
 # LaTex
 #install.packages("tinytex")
 
