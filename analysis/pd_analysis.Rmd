@@ -100,8 +100,7 @@ library(RColorBrewer)
 ## Working directory:
 
 ```{r eval=FALSE, include=FALSE}
-knitr::
-#setwd("~/final-project/")
+setwd("~/final-project/tests")
 
 ```
 
@@ -130,6 +129,27 @@ getCI <- function(vec, n_samp=1000) {
   return(CIs)
 }
 
+```
+
+This function tests normality for prey deliveries in each time interval.
+
+```{r}
+#' getCI
+#' 
+#' @param dat a data.frame where columns = time intervals and rows = # prey deliveries
+#' @param margin.a margin for apply statement running shapiro.test. default = 2.
+#'
+#' @return vector of p.values for each column of dat
+#' 
+#'
+#' @examples
+#'    testNormality(pdM_inc, 2)
+#' @export
+
+testNormality <- function(dat, margin = 2) {
+  norms <- apply(dat, margin, FUN = shapiro.test)
+  return(sapply(norms, function(x){x[["p.value"]]}))
+}
 ```
 
 
@@ -287,7 +307,7 @@ Data was separated by sex (M vs. F) and by incubation vs. nestling stage. Nestli
 
 # Create independent dfs for M (nestling and incubation stage) and F (nestling and incubation state). 
 
-pdStage1 <- pdClean %>%
+pdStage_sex <- pdClean %>%
   dplyr::select(sex, nest_age, t15:t240) %>% #select relevant columns
   mutate(
     stage =
@@ -295,22 +315,22 @@ pdStage1 <- pdClean %>%
   drop_na(stage) #get rid of any rows blank values here, as they can't be used for analysis
 
 #change column names to remove "t" in front of time interval
-colnames(pdStage1) <- c("sex", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
+colnames(pdStage_sex) <- c("sex", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
 
 #create independent dfs for each study site and stage
-pdM_inc <- pdStage1 %>%
+pdM_inc <- pdStage_sex %>%
   filter(sex =="M", stage == "incubation") %>%
   dplyr::select('15':'240')
 
-pdM_nest <- pdStage1 %>% 
+pdM_nest <- pdStage_sex %>% 
   filter(sex =="M", stage == "nestling") %>%
   dplyr::select('15':'240')
 
-pdF_inc <- pdStage1 %>%
+pdF_inc <- pdStage_sex %>%
   filter(sex =="F", stage == "incubation") %>%
   dplyr::select('15':'240')
          
-pdF_nest <- pdStage1 %>%
+pdF_nest <- pdStage_sex %>%
   filter(sex =="F", stage == "nestling") %>%
   dplyr::select('15':'240')
 
@@ -443,10 +463,27 @@ grid.arrange(plotInc_sex, plotNest_sex)
 
 ## Test for Difference
 
+Test for normality.
+
+```{r}
+
+#normality_sex <- data.frame(M_inc = testNormality(pdM_inc, 2), M_nest = testNormality(pdM_nest, 2), F_inc = testNormality(pdF_inc, 2), F_nest = testNormality(pdF_nest, 2))
+
+testNormality(pdM_inc, 2)
+
+testNormality(pdM_nest, 2)
+
+testNormality(pdF_inc, 2)
+
+F_nest = testNormality(pdF_nest, 2)
+```
+
+
 Independent t-test for incubation stage. p = 5.163e-09
 ```{r}
 
 t.test(meanF_inc$F_incubation, meanM_inc$M_incubation)
+
 
 ```
 
