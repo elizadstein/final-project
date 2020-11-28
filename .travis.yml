@@ -12,4 +12,4 @@ before_install: cd analysis
 install: skip
 
 script:
-  - R -e "source('tests/testthat.R')"
+  - R -e "source('../tests/testthat.R')"
