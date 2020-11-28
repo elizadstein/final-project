@@ -463,21 +463,18 @@ grid.arrange(plotInc_sex, plotNest_sex)
 
 ## Test for Difference
 
-Test for normality.
+Test for normality for each time interval in M_inc, M_nest, and F_nest (excluded pdF_inc because all values = 0, as female did not deliver prey while incubating).
 
 ```{r}
+# Store results of testNormality in new df
+normality_sex <- data.frame(M_inc = testNormality(pdM_inc, 2), M_nest = testNormality(pdM_nest, 2), F_nest = testNormality(pdF_nest, 2))
 
-#normality_sex <- data.frame(M_inc = testNormality(pdM_inc, 2), M_nest = testNormality(pdM_nest, 2), F_inc = testNormality(pdF_inc, 2), F_nest = testNormality(pdF_nest, 2))
+# Test if any values are not significant
+any(normality_sex >= 0.05)
 
-testNormality(pdM_inc, 2)
-
-testNormality(pdM_nest, 2)
-
-testNormality(pdF_inc, 2)
-
-F_nest = testNormality(pdF_nest, 2)
 ```
 
+All vectors are significantly different from null hypothesis of Shapiro-Wilk normality test, meaning that no vector is normally distributed. Therefore, we use 
 
 Independent t-test for incubation stage. p = 5.163e-09
 ```{r}
