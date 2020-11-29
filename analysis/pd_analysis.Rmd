@@ -107,7 +107,7 @@ setwd("~/final-project/tests")
 
 ## Custom functions:
 
-The following function is designed to generate bootstrap confidence intervals from a given vector.
+getCI is designed to generate bootstrap confidence intervals from a given vector.
 
 ```{r}
 
@@ -131,10 +131,10 @@ getCI <- function(vec, n_samp=1000) {
 
 ```
 
-This function tests normality for prey deliveries in each time interval.
+testNormality runs a Shapiro-Wilk test on each time interval in a pd data frame and returns p values based on the null hypothesis that the data is normally distributed. If p < 0.05, data is not normally distributed.
 
 ```{r}
-#' getCI
+#' testNormality
 #' 
 #' @param dat a data.frame where columns = time intervals and rows = # prey deliveries
 #' @param margin.a margin for apply statement running shapiro.test. default = 2.
@@ -150,6 +150,30 @@ testNormality <- function(dat, margin = 2) {
   norms <- apply(dat, margin, FUN = shapiro.test)
   return(sapply(norms, function(x){x[["p.value"]]}))
 }
+```
+
+testWilcox runs a Wilcoxon test on the nth columns of two different data frames (i.e. df1[1] and df2[1], df1[2] and df2[2], etc.). We add the argument exact = FALSE to suppress the Warning message that exact p.values with ties can't be computed (warning comes from assumption that values are continuous). This is useful in testing for difference between prey delivery observations at time = 15 in one study site and at time = 15 in a second study site, when the data are not normally distributed.
+
+```{r}
+
+#' testWilcox
+#' 
+#' @param a a data.frame where columns = time intervals and rows = # prey deliveries
+#' @param b a second data.frame where columns = time intervals and rows = # prey deliveries
+#'
+#' @return data.frame of p values (values) and corresponding time intervals (ind)
+#' 
+#'
+#' @examples
+#'    testWilcox(pdMGSA_inc, pdHFSA_inc)
+#' @export
+
+testWilcox <- function(a, b){
+  tmp <- mapply(wilcox.test, a, b, exact = FALSE)
+  p.values <- stack(mapply(function(x, y) wilcox.test(x, y, exact = FALSE)$p.value, a, b))
+  return(p.values)
+}
+
 ```
 
 
@@ -415,6 +439,41 @@ ciAll_sex <- rbind(ciInc_sex, ciNest_sex)
 ```
 
 
+## Test for Difference
+
+Test for normality for each time interval in M_inc, M_nest, and F_nest (excluded pdF_inc because all values = 0, as female did not deliver prey while incubating).
+
+```{r}
+# Store results of testNormality in new df
+normality_sex <- data.frame(
+  M_inc = testNormality(pdM_inc, 2), 
+  M_nest = testNormality(pdM_nest, 2), 
+  F_nest = testNormality(pdF_nest, 2)
+  )
+
+# Test if any values are not significant
+any(normality_sex >= 0.05)
+
+```
+
+All vectors are significantly different from null hypothesis of Shapiro-Wilk normality test, meaning that no vector is normally distributed. Therefore, we use the unpaired two-sample Wilcoxon test.
+
+Independent t-test for incubation stage. p = 5.163e-09
+```{r}
+
+t.test(meanF_inc$F_incubation, meanM_inc$M_incubation)
+
+
+```
+
+Independent t-test for nestling stage. p = 1.355e-08
+```{r}
+
+t.test(meanF_nest$F_nestling, meanM_nest$M_nestling)
+
+```
+
+
 
 ## Plot
 
@@ -461,37 +520,6 @@ grid.arrange(plotInc_sex, plotNest_sex)
 ```
 
 
-## Test for Difference
-
-Test for normality for each time interval in M_inc, M_nest, and F_nest (excluded pdF_inc because all values = 0, as female did not deliver prey while incubating).
-
-```{r}
-# Store results of testNormality in new df
-normality_sex <- data.frame(M_inc = testNormality(pdM_inc, 2), M_nest = testNormality(pdM_nest, 2), F_nest = testNormality(pdF_nest, 2))
-
-# Test if any values are not significant
-any(normality_sex >= 0.05)
-
-```
-
-All vectors are significantly different from null hypothesis of Shapiro-Wilk normality test, meaning that no vector is normally distributed. Therefore, we use 
-
-Independent t-test for incubation stage. p = 5.163e-09
-```{r}
-
-t.test(meanF_inc$F_incubation, meanM_inc$M_incubation)
-
-
-```
-
-Independent t-test for nestling stage. p = 1.355e-08
-```{r}
-
-t.test(meanF_nest$F_nestling, meanM_nest$M_nestling)
-
-```
-
-
 
 # Prey Delivery Rates by Site
 
@@ -512,7 +540,7 @@ Data was separated by study site (HFSA vs. MGSA) and by incubation vs. nestling 
 
 since the last observation for HFSA is at time = 240, we'll end both datasets there.
 
-First, create data frame with PDs for whole dataset, then broken down by each study site and stage.
+First, create data frame with PDs for whole dataset, then broken down by each study site and stage. End incubation data frames at t = 180 and nesting data frames at t = 240 because this is the maximum time when there is data for both sites.
 
 ```{r, pd_indiv}
 
@@ -534,7 +562,7 @@ colnames(pdStage) <- c("study_site", "nest_age", "15", "30", "45", "60", "75", "
 #create independent dfs for each study site and stage
 pdHFSA_inc <- pdStage %>%
   filter(study_site =="HFSA", stage == "incubation") %>%
-  dplyr::select('15':'240')
+  dplyr::select('15':'180')
 
 pdHFSA_nest <- pdStage %>% 
   filter(study_site =="HFSA", stage == "nestling") %>%
@@ -542,7 +570,7 @@ pdHFSA_nest <- pdStage %>%
 
 pdMGSA_inc <- pdStage %>%
   filter(study_site =="MGSA", stage == "incubation") %>%
-  dplyr::select('15':'240')
+  dplyr::select('15':'180')
          
 pdMGSA_nest <- pdStage %>%
   filter(study_site =="MGSA", stage == "nestling") %>%
@@ -580,8 +608,8 @@ meanMGSA_nest <- data.frame(
 
 
 
-Create one table showing mean PDs for all study sites and stages.
-```{r}
+DELETE Create one table showing mean PDs for all study sites and stages.
+```{r eval=FALSE, include=FALSE}
 data.frame(
   time = as.numeric(colnames(pdHFSA_inc)),
   HFSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE),
@@ -608,19 +636,17 @@ ciMGSA_nest <- apply(pdMGSA_nest, 2, FUN = getCI)
 ```
 
 
-Add CIs to a data frame. Remove rows where time > 180 for ciInc because no data is available for MGSA after this time.
+Add CIs to a data frame. 
 
 ```{r}
 
-ciInc <- filter(
-  data.frame(
+ciInc <- data.frame(
     study_area = c(rep("HFSA", nrow(meanHFSA_inc)), rep("MGSA", nrow(meanMGSA_inc))),
     mean = c(colMeans(pdHFSA_inc, na.rm = TRUE), colMeans(pdMGSA_inc, na.rm = TRUE)),
     ci_l = c(ciHFSA_inc[1,], ciMGSA_inc[1,]),
     ci_h = c(ciHFSA_inc[2,], ciMGSA_inc[2,]),
     time = c(as.numeric(rownames(meanHFSA_inc)), as.numeric(rownames(meanMGSA_inc))),
-    stage = "Incubation"),
-  time <= 180)
+    stage = "Incubation")
 
 
 ciNest <- data.frame(
@@ -635,6 +661,45 @@ ciAll <- rbind(ciInc, ciNest)
 
 ```
 
+
+## Test for Difference
+
+Test for normality for each time interval in pdMGSA_inc, pdMGSA_nest, pdHFSA_inc, and pdHFSA_nest.
+
+```{r}
+# Store results of testNormality in new df
+normality_site <- list(
+  MGSA_inc = testNormality(pdMGSA_inc, 2), 
+  MGSA_nest = testNormality(pdMGSA_nest, 2), 
+  HFSA_inc = testNormality(pdHFSA_inc, 2),
+  HFSA_nest = testNormality(pdHFSA_nest, 2))
+
+# Test if any values are not significant
+sapply(normality_site, FUN = function(x){any(x >= 0.05)})
+
+```
+
+All vectors in each list are significantly different from null hypothesis of Shapiro-Wilk normality test, meaning that no vector is normally distributed. Therefore, we use the unpaired two-sample Wilcoxon test to compare median values for each time interval in MGSA and HFSA, for incubation and nestling stages.
+
+```{r}
+
+# Incubation Stage
+wilcox_inc <- testWilcox(pdMGSA_inc, pdHFSA_inc)
+print(wilcox_inc)
+
+any(wilcox_inc$values <= 0.05) #test if any p.values are significantly different: FALSE
+all(wilcox_inc$values > 0.05) #test if all p.values are not significant (double-checking first logical expression's validity): TRUE
+
+# Nestling Stage
+wilcox_nest <- testWilcox(pdMGSA_nest, pdHFSA_nest)
+print(wilcox_nest)
+
+any(wilcox_nest$values <= 0.05) #test if any p.values are significantly different: TRUE
+dplyr::filter(wilcox_nest, values <= 0.05) #print which row has p.value that is significantly different
+
+```
+
+From the Wilcoxon tests, we see that no median time intervals during the incubation stage are different between MGSA and HFSA. However, during the nestling stage, median prey delivery rates at time = 165 are significantly different between MGSA and HFSA.
 
 
 ## Plot
@@ -656,7 +721,7 @@ plotInc <- ggplot(data = ciInc) +
 ```
 
 
-Nestling:
+Nestling (including star indicating significant Wilcoxon test at t = 165):
 ```{r}
 
 plotNest <- ggplot(data = ciNest) +
@@ -668,12 +733,13 @@ plotNest <- ggplot(data = ciNest) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Nestling", color = "Study Area") +
   theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_point(aes(x = 165, y = 2.0), shape = 8, stroke = 0.1)
 
 ```
 
 Both:
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 plotAll <- ggplot(data = ciAll) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
@@ -698,20 +764,5 @@ grid.arrange(plotInc, plotNest)
 
 ```
 
-## Test for Difference
-
-Independent t-tests for incubation stage. p = 0.8786
-```{r}
-
-t.test(meanHFSA_inc$HFSA_incubation, meanMGSA_inc$MGSA_incubation)
-
-```
 
 
-Independent t-tests for nestling stage. p = 0.377
-
-```{r}
-
-t.test(meanHFSA_nest$HFSA_nestling, meanMGSA_nest$MGSA_nestling)
-
-```
