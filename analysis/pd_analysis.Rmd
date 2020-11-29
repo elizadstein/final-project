@@ -456,28 +456,31 @@ any(normality_sex >= 0.05)
 
 ```
 
-All vectors are significantly different from null hypothesis of Shapiro-Wilk normality test, meaning that no vector is normally distributed. Therefore, we use the unpaired two-sample Wilcoxon test.
+All vectors in each list are significantly different from null hypothesis of Shapiro-Wilk normality test, meaning that no vector is normally distributed. Therefore, we use the unpaired two-sample Wilcoxon test to compare median values of M and F prey deliveries during each time interval, for incubation and nestling stages.
 
-Independent t-test for incubation stage. p = 5.163e-09
 ```{r}
 
-t.test(meanF_inc$F_incubation, meanM_inc$M_incubation)
+# Incubation Stage
+wilcox_inc_sex <- testWilcox(pdM_inc, pdF_inc)
 
+any(wilcox_inc_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
+all(wilcox_inc_sex$values <= 0.05) #test if all p.values are significantly different: FALSE
+dplyr::filter(wilcox_inc_sex, values <= 0.05) #print which rows have p.value that is significantly different
+
+# Nestling Stage
+wilcox_nest_sex <- testWilcox(pdM_nest, pdF_nest)
+
+any(wilcox_nest_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
+all(wilcox_nest_sex$values <= 0.05) #test if all p.values are significantly different: TRUE
 
 ```
 
-Independent t-test for nestling stage. p = 1.355e-08
-```{r}
-
-t.test(meanF_nest$F_nestling, meanM_nest$M_nestling)
-
-```
-
+From the Wilcoxon tests, we see that all median time intervals during the nestling stage are significantly different between males and females. However, during the incubation stage, median prey delivery rates at time = 2255 and time = 240 are not significantly different between males and females.
 
 
 ## Plot
 
-Incubation:
+Incubation (including star indicating non-significant Wilcoxon test at t = 225 and t = 240):
 ```{r}
 
 plotInc_sex <- ggplot(data = ciInc_sex) +
@@ -489,7 +492,9 @@ plotInc_sex <- ggplot(data = ciInc_sex) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Incubation", color = "Sex") +
   theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_point(aes(x = 225, y = 4.5), shape = 8, stroke = 0.1) +
+  geom_point(aes(x = 240, y = 3.5), shape = 8, stroke = 0.1)
 
 ```
 
@@ -506,7 +511,7 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
   labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
        title = "Nestling", color = "Sex") +
   theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) 
 
 ```
 
