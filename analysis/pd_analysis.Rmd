@@ -715,11 +715,41 @@ plotNest_site <- ggplot(data = ciNest) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r, fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r final_plot_site, fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_site, plotNest_site)
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -15,4 +15,4 @@ testthat::test_file('../tests/testthat/test-1.R')
 testthat::test_file('../tests/testthat/test-2.R')
 system('-rm pd_analysis.R')
 
-knitr::knit2pdf('../analysis/pd_analysis.Rmd')
+rmarkdown::render('../analysis/pd_analysis.Rmd', output_format ='pdf_document', output_dir = '../manuscript', output_file = 'manuscript')

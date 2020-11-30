@@ -1,0 +1,542 @@
+## ----set_message----------------------------------------------------------------------------------------------------------
+
+knitr::opts_chunk$set(message = FALSE)
+
+
+
+## ----install_spatial_packages, include=FALSE------------------------------------------------------------------------------
+# LaTex
+#install.packages("tinytex")
+
+# Data manipulation and visualization
+install.packages("tidyverse", repos='http://cran.us.r-project.org')
+install.packages("gridExtra", repos='http://cran.us.r-project.org')
+
+
+
+## ----eval=FALSE, include=FALSE--------------------------------------------------------------------------------------------
+## # Spatial data analysis
+## install.packages("sp", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+## install.packages("raster", repos='http://cran.us.r-project.org')
+## install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+## install.packages("sf", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+## install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
+
+
+## ----load_basic_packages--------------------------------------------------------------------------------------------------
+
+# Data manipulation and visualization
+library(tidyverse)
+library(gridExtra)
+
+
+
+## ----load_spatial_packages, eval=FALSE, include=FALSE---------------------------------------------------------------------
+## # Spatial data analysis
+## library(sp)
+## library(raster)
+## library(rgdal)
+## library(sf)
+## library(RColorBrewer)
+## #library(ggmap)
+## 
+
+
+## ----setwd, eval=FALSE, include=FALSE-------------------------------------------------------------------------------------
+## 
+## setwd("~/final-project/analysis)
+## 
+
+
+## ----getCI----------------------------------------------------------------------------------------------------------------
+
+#' getCI
+#' 
+#' @param vec a vector
+#' @param n_samp number of times to sample data
+#'
+#' @return upper and lower bootstrap confidence intervals
+#' 
+#'
+#' @examples
+#'    getCI(1:20, 2000)
+#' @export
+
+getCI <- function(vec, n_samp=1000) {
+  smp <- replicate(n_samp, mean(sample(vec, replace = TRUE), na.rm = TRUE))
+  CIs <-quantile(smp, c(0.025, 0.975), na.rm = T)
+  return(CIs)
+}
+
+
+
+## ----testNormality--------------------------------------------------------------------------------------------------------
+#' testNormality
+#' 
+#' @param dat a data.frame where columns = time intervals and rows = # prey deliveries
+#' @param margin.a margin for apply statement running shapiro.test. default = 2.
+#'
+#' @return vector of p.values for each column of dat
+#' 
+#'
+#' @examples
+#'    testNormality(pdM_inc, 2)
+#' @export
+
+testNormality <- function(dat, margin = 2) {
+  norms <- apply(dat, margin, FUN = shapiro.test)
+  return(sapply(norms, function(x){x[["p.value"]]}))
+}
+
+
+## ----testWilcox-----------------------------------------------------------------------------------------------------------
+
+#' testWilcox
+#' 
+#' @param a a data.frame where columns = time intervals and rows = # prey deliveries
+#' @param b a second data.frame where columns = time intervals and rows = # prey deliveries
+#'
+#' @return data.frame of p values (values) and corresponding time intervals (ind)
+#' 
+#'
+#' @examples
+#'    testWilcox(pdMGSA_inc, pdHFSA_inc)
+#' @export
+
+testWilcox <- function(a, b){
+  tmp <- mapply(wilcox.test, a, b, exact = FALSE)
+  p.values <- stack(mapply(function(x, y) wilcox.test(x, y, exact = FALSE)$p.value, a, b))
+  return(p.values)
+}
+
+
+
+## ----load_boundary, eval=FALSE, include=FALSE-----------------------------------------------------------------------------
+## 
+## # Load Boundary
+## boundary_sf <- st_read("../analysis/images/hayman.shp")
+## 
+## # Get extent
+## ext <- st_bbox(boundary_sf)
+## 
+
+
+## ----load_severity, eval=FALSE, include=FALSE-----------------------------------------------------------------------------
+## 
+## # Load raster image
+## severity <- raster("../analysis/images/burn_severity/burn_severity.adf")
+## 
+## # Change boundary shapefile class from `sf` to `spatial`
+## boundary_sp <- as(boundary_sf, "Spatial")
+## 
+## # Use fire boundary to crop fire severity raster
+## severity_crop <- raster::crop(severity, boundary_sp)
+## 
+## # Then mask by actual polygon
+## severity_crop <- raster::mask(severity_crop, boundary_sp)
+## 
+## # Convert to df
+## severity_df <- raster::as.data.frame(severity_crop, xy = TRUE)
+## 
+## # Remove red hole in middle
+## severity_df$burn_severity[severity_df$burn_severity == 6] <- NA
+## 
+## # Plot severity
+## fire_colors <- rev(brewer.pal(n = 7, "RdYlGn")) %>%
+##   colorRampPalette()
+## 
+## severity_plot <- ggplot() +
+##   geom_raster(data = severity_df, aes(x = x, y = y,
+##     fill = burn_severity)) +
+##   scale_fill_gradientn(name = "Burn Severity", colors = fire_colors(7), na.value = "white") +
+##   theme_void()
+## 
+## # Plot severity with boundary overlay
+## sev_bound_plot <- severity_plot +
+##   geom_sf(data = boundary_sf, size = 1, color = "black", fill = NA) +
+##   coord_sf() +
+##   theme_void()
+## 
+
+
+## ----plot_severity, eval=FALSE, include=FALSE-----------------------------------------------------------------------------
+## # Read in nest tree data
+## nest_dat <- read.csv("../data/nest_trees.csv")
+## 
+## # Plot nest trees over Hayman burn map
+## sev_bound_plot +
+##   geom_point(data = nest_dat, mapping = aes(x = x_coord, y = y_coord), color = "red") +
+##   ggtitle("Hayman Fire Nest Sites") +
+##   theme_void() +
+##   theme(plot.title = element_text(hjust = 0.5))
+## 
+## 
+
+
+## ----basemap, eval=FALSE, include=FALSE-----------------------------------------------------------------------------------
+## # Get extent of Hayman from shapefile
+## st_bbox(boundary_sf)
+## 
+## co_basemap <- get_map(location=c(left = -46.18558, bottom = 43.156723, right = -49.08987, top = 43.524593), zoom=11, maptype = 'terrain-background', source = 'stamen')
+## 
+## 
+## plot(co_basemap)
+
+
+## ----load_pd_main---------------------------------------------------------------------------------------------------------
+
+pdOriginal <- read.csv("../data/pd_main.csv")
+
+#rename the first column, which imported with a special character
+names(pdOriginal)[1] <- "nest"
+
+
+
+## ----pdMF-----------------------------------------------------------------------------------------------------------------
+
+pdMF <- pdOriginal %>%
+  separate(col = nest, into = c("study_site", "territory"), sep = 1, remove = TRUE) %>%
+  filter(sex == "M" | sex == "F")
+
+
+
+## ----str_pdMF-------------------------------------------------------------------------------------------------------------
+
+pd_str <- str(pdMF)
+
+unique(pdMF$t180) #at least one cell has an asterisk after the value
+unique(pdMF$t225) #same here
+unique(pdMF$nest_age) #"pred" and "" can be converted to NA
+
+
+
+## ----pdClean--------------------------------------------------------------------------------------------------------------
+
+#remove asterisks
+pdClean <- pdMF %>%
+  mutate(t180 = gsub("\\*", "", t180)) %>%
+  mutate(t225 = gsub("\\*", "", t225)) 
+
+
+#change these columns to numeric
+pdClean$t180 <- as.integer(pdClean$t180)
+pdClean$t225 <- as.integer(pdClean$t225)
+pdClean$nest_age <- as.integer(pdClean$nest_age) 
+
+
+
+## ----pd_DFs_sex-----------------------------------------------------------------------------------------------------------
+
+# Create independent dfs for M (nestling and incubation stage) and F (nestling and incubation state). 
+
+pdStage_sex <- pdClean %>%
+  dplyr::select(sex, nest_age, t15:t240) %>% #select relevant columns
+  mutate(
+    stage =
+      ifelse(nest_age < 22, "incubation", "nestling")) %>% #add column for 'stage'
+  drop_na(stage) #get rid of any rows blank values here, as they can't be used for analysis
+  
+#change column names to remove "t" in front of time interval
+colnames(pdStage_sex) <- c("sex", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
+
+#create independent dfs for each study site and stage
+pdM_inc <- pdStage_sex %>%
+  filter(sex =="M", stage == "incubation") %>%
+  dplyr::select('15':'240')
+
+pdM_nest <- pdStage_sex %>% 
+  filter(sex =="M", stage == "nestling") %>%
+  dplyr::select('15':'240')
+
+pdF_inc <- pdStage_sex %>%
+  filter(sex =="F", stage == "incubation") %>%
+  dplyr::select('15':'240')
+         
+pdF_nest <- pdStage_sex %>%
+  filter(sex =="F", stage == "nestling") %>%
+  dplyr::select('15':'240')
+
+
+
+## ----mean_DFs_sex---------------------------------------------------------------------------------------------------------
+
+meanM_inc <- data.frame(
+  time = as.numeric(colnames(pdM_inc)),
+  M_incubation = colMeans(pdM_inc, na.rm = TRUE))
+
+meanM_nest <- data.frame(
+  time = as.numeric(colnames(pdM_nest)),
+  M_nestling = colMeans(pdM_nest, na.rm = TRUE))
+
+meanF_inc <- data.frame(
+  time = as.numeric(colnames(pdF_inc)),
+  F_incubation = colMeans(pdF_inc, na.rm = TRUE))
+
+meanF_nest <- data.frame(
+  time = as.numeric(colnames(pdF_nest)),
+  F_nestling = colMeans(pdF_nest, na.rm = TRUE))
+
+
+
+## ----CIs_sex--------------------------------------------------------------------------------------------------------------
+
+ciM_inc <- apply(pdM_inc, 2, FUN = getCI)
+ciM_nest <- apply(pdM_nest, 2, FUN = getCI)
+ciF_inc <- apply(pdF_inc, 2, FUN = getCI)
+ciF_nest <- apply(pdF_nest, 2, FUN = getCI)
+
+
+## ----ciDF_sex-------------------------------------------------------------------------------------------------------------
+
+ciInc_sex <- data.frame(
+    sex = c(rep("M", nrow(meanM_inc)), rep("F", nrow(meanF_inc))),
+    mean = c(colMeans(pdM_inc, na.rm = TRUE), colMeans(pdF_inc, na.rm = TRUE)),
+    ci_l = c(ciM_inc[1,], ciF_inc[1,]),
+    ci_h = c(ciM_inc[2,], ciF_inc[2,]),
+    time = c(as.numeric(rownames(meanM_inc)), as.numeric(rownames(meanF_inc))),
+    stage = "Incubation")
+
+
+ciNest_sex <- data.frame(
+    sex = c(rep("M", nrow(meanM_nest)), rep("F", nrow(meanF_nest))),
+    mean = c(colMeans(pdM_nest, na.rm = TRUE), colMeans(pdF_nest, na.rm = TRUE)),
+    ci_l = c(ciM_nest[1,], ciF_nest[1,]),
+    ci_h = c(ciM_nest[2,], ciF_nest[2,]),
+    time = c(as.numeric(rownames(meanM_nest)), as.numeric(rownames(meanF_nest))),
+    stage = "Nestling")
+    
+ciAll_sex <- rbind(ciInc_sex, ciNest_sex)
+
+
+
+## ----testNormality_sex----------------------------------------------------------------------------------------------------
+
+# Store results of testNormality in new df
+normality_sex <- data.frame(
+  M_inc = testNormality(pdM_inc, 2), 
+  M_nest = testNormality(pdM_nest, 2), 
+  F_nest = testNormality(pdF_nest, 2)
+  )
+
+# Test if any values are not significant
+any(normality_sex >= 0.05)
+
+
+
+## ----testWilcox_sex-------------------------------------------------------------------------------------------------------
+
+# Incubation Stage
+wilcox_inc_sex <- testWilcox(pdM_inc, pdF_inc)
+
+any(wilcox_inc_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
+all(wilcox_inc_sex$values <= 0.05) #test if all p.values are significantly different: FALSE
+dplyr::filter(wilcox_inc_sex, values <= 0.05) #print which rows have p.value that is significantly different
+
+# Nestling Stage
+wilcox_nest_sex <- testWilcox(pdM_nest, pdF_nest)
+
+any(wilcox_nest_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
+all(wilcox_nest_sex$values <= 0.05) #test if all p.values are significantly different: TRUE
+
+
+
+## ----plotInc_sex----------------------------------------------------------------------------------------------------------
+
+plotInc_sex <- ggplot(data = ciInc_sex) +
+  geom_point(aes(x = time, y = mean, color = sex, group = sex),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
+                    group = sex),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Incubation", color = "Sex") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_point(aes(x = 225, y = 4.5), shape = 8, stroke = 0.1) +
+  geom_point(aes(x = 240, y = 3.5), shape = 8, stroke = 0.1)
+
+
+
+## ----plotNest_sex---------------------------------------------------------------------------------------------------------
+
+plotNest_sex <- ggplot(data = ciNest_sex) +
+  geom_point(aes(x = time, y = mean, color = sex, group = sex),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
+                    group = sex),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Nestling", color = "Sex") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+
+
+## ----final_plot_sex, fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."----
+
+grid.arrange(plotInc_sex, plotNest_sex)
+
+
+
+## ----pdHM-----------------------------------------------------------------------------------------------------------------
+
+pdHM <- pdClean %>%
+  filter(study_site == "B" | study_site == "C", sex == "M")
+
+
+
+## ---- pd_DFs_site---------------------------------------------------------------------------------------------------------
+
+#create independet dfs for HFSA (nestling and incubation stage) and MGSA (nestling and incubation state). 
+
+#select relevant columns, add column for stage, rename study sites, drop NAs
+pdStage_site <- pdClean %>%
+  dplyr::select(study_site, nest_age, t15:t240) %>%
+  mutate(
+    stage =
+      ifelse(nest_age < 22, "incubation", "nestling"),
+    study_site =
+      ifelse(study_site == "B", "MGSA", "HFSA")) %>%
+  drop_na(stage)
+
+#change column names to remove "t" in front of time interval
+colnames(pdStage_site) <- c("study_site", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
+
+#create independent dfs for each study site and stage
+pdHFSA_inc <- pdStage_site %>%
+  filter(study_site =="HFSA", stage == "incubation") %>%
+  dplyr::select('15':'180')
+
+pdHFSA_nest <- pdStage_site %>% 
+  filter(study_site =="HFSA", stage == "nestling") %>%
+  dplyr::select('15':'240')
+
+pdMGSA_inc <- pdStage_site %>%
+  filter(study_site =="MGSA", stage == "incubation") %>%
+  dplyr::select('15':'180')
+         
+pdMGSA_nest <- pdStage_site %>%
+  filter(study_site =="MGSA", stage == "nestling") %>%
+  dplyr::select('15':'240')
+
+
+
+
+## ----mean_DFs_site--------------------------------------------------------------------------------------------------------
+
+meanHFSA_inc <- data.frame(
+  time = as.numeric(colnames(pdHFSA_inc)),
+  HFSA_incubation = colMeans(pdHFSA_inc, na.rm = TRUE))
+
+meanHFSA_nest <- data.frame(
+  time = as.numeric(colnames(pdHFSA_nest)),
+  HFSA_nestling = colMeans(pdHFSA_nest, na.rm = TRUE))
+
+meanMGSA_inc <- data.frame(
+  time = as.numeric(colnames(pdMGSA_inc)),
+  MGSA_incubation = colMeans(pdMGSA_inc, na.rm = TRUE))
+
+meanMGSA_nest <- data.frame(
+  time = as.numeric(colnames(pdMGSA_nest)),
+  MGSA_nestling = colMeans(pdMGSA_nest, na.rm = TRUE))
+
+
+
+## ----CIs_site-------------------------------------------------------------------------------------------------------------
+
+ciHFSA_inc <- apply(pdHFSA_inc, 2, FUN = getCI)
+ciHFSA_nest <- apply(pdHFSA_nest, 2, FUN = getCI)
+ciMGSA_inc <- apply(pdMGSA_inc, 2, FUN = getCI)
+ciMGSA_nest <- apply(pdMGSA_nest, 2, FUN = getCI)
+
+
+## ----ciDF_site------------------------------------------------------------------------------------------------------------
+
+ciInc <- data.frame(
+    study_area = c(rep("HFSA", nrow(meanHFSA_inc)), rep("MGSA", nrow(meanMGSA_inc))),
+    mean = c(colMeans(pdHFSA_inc, na.rm = TRUE), colMeans(pdMGSA_inc, na.rm = TRUE)),
+    ci_l = c(ciHFSA_inc[1,], ciMGSA_inc[1,]),
+    ci_h = c(ciHFSA_inc[2,], ciMGSA_inc[2,]),
+    time = c(as.numeric(rownames(meanHFSA_inc)), as.numeric(rownames(meanMGSA_inc))),
+    stage = "Incubation")
+
+
+ciNest <- data.frame(
+    study_area = c(rep("HFSA", nrow(meanHFSA_nest)), rep("MGSA", nrow(meanMGSA_nest))),
+    mean = c(colMeans(pdHFSA_nest, na.rm = TRUE), colMeans(pdMGSA_nest, na.rm = TRUE)),
+    ci_l = c(ciHFSA_nest[1,], ciMGSA_nest[1,]),
+    ci_h = c(ciHFSA_nest[2,], ciMGSA_nest[2,]),
+    time = c(as.numeric(rownames(meanHFSA_nest)), as.numeric(rownames(meanMGSA_nest))),
+    stage = "Nestling")
+    
+ciAll <- rbind(ciInc, ciNest)
+
+
+
+## ----getNormality_site----------------------------------------------------------------------------------------------------
+# Store results of testNormality in new df
+normality_site <- list(
+  MGSA_inc = testNormality(pdMGSA_inc, 2), 
+  MGSA_nest = testNormality(pdMGSA_nest, 2), 
+  HFSA_inc = testNormality(pdHFSA_inc, 2),
+  HFSA_nest = testNormality(pdHFSA_nest, 2))
+
+# Test if any values are not significant
+sapply(normality_site, FUN = function(x){any(x >= 0.05)})
+
+
+
+## ----getWilcox_site-------------------------------------------------------------------------------------------------------
+
+# Incubation Stage
+wilcox_inc <- testWilcox(pdMGSA_inc, pdHFSA_inc)
+print(wilcox_inc)
+
+any(wilcox_inc$values <= 0.05) #test if any p.values are significantly different: FALSE
+all(wilcox_inc$values > 0.05) #test if all p.values are not significant (double-checking first logical expression's validity): TRUE
+
+# Nestling Stage
+wilcox_nest <- testWilcox(pdMGSA_nest, pdHFSA_nest)
+print(wilcox_nest)
+
+any(wilcox_nest$values <= 0.05) #test if any p.values are significantly different: TRUE
+dplyr::filter(wilcox_nest, values <= 0.05) #print which row has p.value that is significantly different
+
+
+
+## ----plotInc_site---------------------------------------------------------------------------------------------------------
+
+plotInc_site <- ggplot(data = ciInc) +
+  geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
+                    group = study_area),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Incubation", color = "Study Area") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+
+## ----plotNest_site--------------------------------------------------------------------------------------------------------
+
+plotNest_site <- ggplot(data = ciNest) +
+  geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
+             position = position_dodge(width=0.75)) +
+  geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
+                    group = study_area),
+                position = position_dodge(width=0.75)) +
+  labs(x = "Time After Sunset (minutes)", y = "Mean Prey Deliveries", 
+       title = "Nestling", color = "Study Area") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_point(aes(x = 165, y = 2.0), shape = 8, stroke = 0.1)
+
+
+
+## ----final_plot_site, fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."----
+
+grid.arrange(plotInc_site, plotNest_site)
+
+
