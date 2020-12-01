@@ -7,10 +7,11 @@ r:
 - release
 - devel
 
-before_install: cd analysis
+before_install:
   - sudo apt-get update
-  - sudo apt-get install libgdal-dev libproj-dev
+  - sudo apt-get install libgdal-dev libproj-dev libxml2-dev libssl-dev
   - sudo apt install -y libudunits2-0 libudunits2-dev
+  - cd analysis
 
 
 install: skip
