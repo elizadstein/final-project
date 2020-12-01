@@ -66,7 +66,7 @@ install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 # Spatial data analysis
 install.packages("sp", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
 install.packages("raster", repos='http://cran.us.r-project.org')
@@ -83,7 +83,7 @@ library(gridExtra)
 
 ```
 
-```{r load_spatial_packages, eval=FALSE, include=FALSE}
+```{r load_spatial_packages}
 # Spatial data analysis
 library(sp)
 library(raster)
@@ -181,7 +181,7 @@ testWilcox <- function(a, b){
 
 Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N. 
 
-```{r load_boundary, eval=FALSE, include=FALSE}
+```{r load_boundary}
 
 # Load Boundary
 boundary_sf <- st_read("../analysis/images/hayman.shp")
@@ -194,7 +194,7 @@ ext <- st_bbox(boundary_sf)
 
 Load in fire severity raster data:
 
-```{r load_severity, eval=FALSE, include=FALSE}
+```{r load_severity}
 
 # Load raster image
 severity <- raster("../analysis/images/burn_severity/burn_severity.adf")
@@ -235,7 +235,7 @@ sev_bound_plot <- severity_plot +
 
 Plot nest locations (n = 45) on Hayman Fire severity map:
 
-```{r plot_severity, eval=FALSE, include=FALSE}
+```{r plot_severity}
 # Read in nest tree data
 nest_dat <- read.csv("../data/nest_trees.csv")
 
