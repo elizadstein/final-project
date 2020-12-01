@@ -8,6 +8,10 @@ r:
 - devel
 
 before_install: cd analysis
+  - sudo apt-get update
+  - sudo apt-get install libgdal-dev libproj-dev
+  - sudo apt install -y libudunits2-0 libudunits2-dev
+
 
 install: skip
 
