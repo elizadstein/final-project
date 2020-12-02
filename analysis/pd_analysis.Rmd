@@ -2,7 +2,7 @@
 output:
   pdf_document:
     citation_package: natbib
-    keep_tex: false
+    keep_tex: true
     latex_engine: xelatex
 title: "Nest Provisioning in a Fire Disturbed Landscape"
 author: "Eliza Stein"
@@ -60,15 +60,15 @@ install.packages("tidyr", repos='http://cran.us.r-project.org')
 install.packages("ggplot2", repos='http://cran.us.r-project.org')
 
 # Spatial data analysis
-install.packages("raster", repos='http://cran.us.r-project.org')
 install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+install.packages("raster", repos='http://cran.us.r-project.org')
 install.packages("sf", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
 install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 ```
 
 ```{r set_message}
 
-knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(message = FALSE, tidy.opts=list(width.cutoff=60), tidy=TRUE)
 
 ```
 
