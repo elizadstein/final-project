@@ -4,8 +4,6 @@ install.packages('testthat')
 
 library(knitr)
 library(testthat)
-library(tinytex)
-tinytex::install_tinytex()
 
 
 
