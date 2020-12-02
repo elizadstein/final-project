@@ -54,10 +54,8 @@ All relative paths begin at the final-project/analysis subdirectory.
 
 # Data manipulation and visualization
 install.packages("knitr", repos='http://cran.us.r-project.org')
-install.packages("plyr", repos='http://cran.us.r-project.org')
-install.packages("dplyr", repos='http://cran.us.r-project.org')
-install.packages("tidyr", repos='http://cran.us.r-project.org')
-install.packages("ggplot2", repos='http://cran.us.r-project.org')
+install.packages("tidyverse", repos='http://cran.us.r-project.org')
+install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
 # Spatial data analysis
 install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
@@ -68,7 +66,7 @@ install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
 
 ```{r set_message}
 
-knitr::opts_chunk$set(message = FALSE, tidy.opts=list(width.cutoff=60), tidy=TRUE)
+knitr::opts_chunk$set(message = FALSE)
 
 ```
 
@@ -76,14 +74,12 @@ knitr::opts_chunk$set(message = FALSE, tidy.opts=list(width.cutoff=60), tidy=TRU
 
 # Data manipulation and visualization
 library(knitr)
-library(plyr)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
+library(gridExtra)
 
 # Spatial data analysis
-library(raster)
 library(rgdal)
+library(raster)
 library(sf)
 library(RColorBrewer)
 
@@ -207,7 +203,7 @@ severity_crop <- raster::crop(severity, boundary_sp)
 severity_crop <- raster::mask(severity_crop, boundary_sp)
 
 # Convert to df
-severity_df <- raster::as.data.frame(severity_crop, xy = TRUE)
+severity_df <- as.data.frame(severity_crop, xy = TRUE)
 
 # Remove red hole in middle
 severity_df$burn_severity[severity_df$burn_severity == 6] <- NA
@@ -233,7 +229,7 @@ sev_bound_plot <- severity_plot +
 
 Plot nest locations (n = 45) on Hayman Fire severity map:
 
-```{r plot_severity, fig.cap = "Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
+```{r plot_severity, fig.path = "../manuscript/figures", fig.cap = "Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
 # Read in nest tree data
 nest_dat <- read.csv("../data/nest_trees.csv")
 
@@ -312,7 +308,7 @@ Data was separated by sex (M vs. F) and by incubation vs. nestling stage. Nestli
 
 ```{r pd_DFs_sex}
 
-# Create independent dfs for M (nestling and incubation stage) and F (nestling and incubation state). 
+# Create independent dfs for M (nestling and incubation stage) and F (nestling and incubation stage). 
 
 pdStage_sex <- pdClean %>%
   dplyr::select(sex, nest_age, t15:t240) %>% #select relevant columns
@@ -322,7 +318,9 @@ pdStage_sex <- pdClean %>%
   drop_na(stage) #get rid of any rows blank values here, as they can't be used for analysis
   
 #change column names to remove "t" in front of time interval
-colnames(pdStage_sex) <- c("sex", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
+colnames(pdStage_sex) <- c("sex", "nest_age", "15", "30", "45", "60", "75", "90", 
+                           "105", "120", "135", "150", "165", "180", "195", "210", 
+                           "225", "240", "stage")
 
 #create independent dfs for each study site and stage
 pdM_inc <- pdStage_sex %>%
@@ -432,6 +430,7 @@ All vectors in each list are significantly different from null hypothesis of Sha
 
 # Incubation Stage
 wilcox_inc_sex <- testWilcox(pdM_inc, pdF_inc)
+print(wilcox_inc_sex)
 
 any(wilcox_inc_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
 all(wilcox_inc_sex$values <= 0.05) #test if all p.values are significantly different: FALSE
@@ -439,6 +438,7 @@ dplyr::filter(wilcox_inc_sex, values <= 0.05) #print which rows have p.value tha
 
 # Nestling Stage
 wilcox_nest_sex <- testWilcox(pdM_nest, pdF_nest)
+print(wilcox_nest_sex)
 
 any(wilcox_nest_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
 all(wilcox_nest_sex$values <= 0.05) #test if all p.values are significantly different: TRUE
@@ -453,7 +453,7 @@ From the Wilcoxon tests, we see that all median time intervals during the nestli
 Incubation (including star indicating non-significant Wilcoxon test at t = 225 and t = 240):
 ```{r plotInc_sex}
 
-ggplot(data = ciInc_sex) +
+plotInc_sex <- ggplot(data = ciInc_sex) +
   geom_point(aes(x = time, y = mean, color = sex, group = sex),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
@@ -470,9 +470,9 @@ ggplot(data = ciInc_sex) +
 
 
 Nestling:
-```{r plotNest_sex, fig.cap = "Figure 2. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r plotNest_sex}
 
-ggplot(data = ciNest_sex) +
+plotNest_sex <- ggplot(data = ciNest_sex) +
   geom_point(aes(x = time, y = mean, color = sex, group = sex),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
@@ -488,7 +488,7 @@ ggplot(data = ciNest_sex) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r final_plot_sex, eval=FALSE, fig.cap=, include=FALSE}
+```{r plot_sex, fig.path = "../manuscript/figures", fig.cap = "Figure 2. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_sex, plotNest_sex)
 
@@ -532,7 +532,9 @@ pdStage_site <- pdClean %>%
   drop_na(stage)
 
 #change column names to remove "t" in front of time interval
-colnames(pdStage_site) <- c("study_site", "nest_age", "15", "30", "45", "60", "75", "90", "105", "120", "135", "150", "165", "180", "195", "210", "225", "240", "stage")
+colnames(pdStage_site) <- c("study_site", "nest_age", "15", "30", "45", "60", 
+                            "75", "90", "105", "120", "135", "150", "165", "180", 
+                            "195", "210", "225", "240", "stage")
 
 #create independent dfs for each study site and stage
 pdHFSA_inc <- pdStage_site %>%
@@ -643,16 +645,18 @@ All vectors in each list are significantly different from null hypothesis of Sha
 ```{r getWilcox_site}
 
 # Incubation Stage
-wilcox_inc <- testWilcox(pdMGSA_inc, pdHFSA_inc)
+wilcox_inc_site <- testWilcox(pdMGSA_inc, pdHFSA_inc)
+print(wilcox_inc_site)
 
-any(wilcox_inc$values <= 0.05) #test if any p.values are significantly different: FALSE
-all(wilcox_inc$values > 0.05) #test if all p.values are not significant (double-checking first logical expression's validity): TRUE
+any(wilcox_inc_site$values <= 0.05) #test if any p.values are significantly different: FALSE
+all(wilcox_inc_site$values > 0.05) #test if all p.values are not significant (double-checking first logical expression's validity): TRUE
 
 # Nestling Stage
-wilcox_nest <- testWilcox(pdMGSA_nest, pdHFSA_nest)
+wilcox_nest_site <- testWilcox(pdMGSA_nest, pdHFSA_nest)
+print(wilcox_nest_site)
 
-any(wilcox_nest$values <= 0.05) #test if any p.values are significantly different: TRUE
-dplyr::filter(wilcox_nest, values <= 0.05) #print which row has p.value that is significantly different
+any(wilcox_nest_site$values <= 0.05) #test if any p.values are significantly different: TRUE
+dplyr::filter(wilcox_nest_site, values <= 0.05) #print which row has p.value that is significantly different
 
 ```
 
@@ -661,11 +665,11 @@ From the Wilcoxon tests, we see that no median time intervals during the incubat
 
 ## Plot
 
-Mean prey deliveries throughout night in incubation and nestling stage (including star indicating significant Wilcoxon test at t = 165):
+Mean prey deliveries throughout night in incubation stage:
 
-```{r plot_site, fig.cap = "Figure 3. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r plotInc_site}
 
-ggplot(data = ciInc) +
+plotInc_site <- ggplot(data = ciInc) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -675,9 +679,14 @@ ggplot(data = ciInc) +
        title = "Incubation", color = "Study Area") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
+```
 
 
-ggplot(data = ciNest) +
+Mean prey deliveries throughout night in the nestling stage (including star indicating significant Wilcoxon test at t = 165):
+
+```{r plotNest_site}
+
+plotNest_site <- ggplot(data = ciNest) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -694,7 +703,7 @@ ggplot(data = ciNest) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r final_plot_site, eval=FALSE, fig.cap=, include=FALSE}
+```{r plot_site, fig.path = "../manuscript/figures", fig.cap = "Figure 3. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_site, plotNest_site)
 
