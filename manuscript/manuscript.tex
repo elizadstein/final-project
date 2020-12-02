@@ -108,7 +108,7 @@
 
 \title{Nest Provisioning in a Fire Disturbed Landscape}
 \author{Eliza Stein}
-\date{11/8/2020}
+\date{12/3/2020}
 
 \begin{document}
 \maketitle
@@ -147,23 +147,26 @@ foliage-gleaning moths \citep{reynolds1992flammulated}. The Hayman Fire
 scar, which was previously dominated by prime Flammulated Owl habitat,
 continues to attract breeding individuals, but their success in this
 sub-optimal habitat is not well supported. Survival models show that
-annual adult Flammulated Owl suvival in the Hayman Fire burn scar is
-currently lower than in a nearby control site, and adult annual survival
-in the burn scar appears to be decreasing each year following the fire
-(Yanco et al.~unpublished data).
+annual adult Flammulated Owl survival in the Hayman Fire burn scar is
+currently lower for males than in a nearby control site, and adult
+annual survival in the burn scar appears to be decreasing each year
+following the fire (Yanco et al.~unpublished data).
 
-Here, I examine one possible explanation for decreased survivorship in
-the Hayman Fire burn area: foraging ability. High severity burns
-dramatically alter vegetation structure, which in turn alters insect
-communities. Over time, insect communities within high intensity burn
-scars can crash, leaving avian predators without important food
-resources \citep{nappi2010effect}. The Hayman Fire also resulted in the
-mortality of almost all trees in its path, particularly old-growth
-conifers \citep{fornwalt2016did}. Flammulated Owls have been shown to
-favor old-growth conifers for foraging in Colorado. According to one
-study, 80\% of prey captures were in Ponderosa Pine or Douglas Fir
-trees, and the mean age of foraging trees was 199 years (compared to an
-overall forest mean of 111 years) \citep{reynolds1992flammulated}. If
+Here, I examine one possible explanation for decreased male survivorship
+in the Hayman Fire burn area: foraging ability. Observational data
+suggests that males are the primary nest provisioners throughout the
+breeding season, meaning that they could be suffereing from increased
+energy demands more thatn females. High severity burns dramatically
+alter vegetation structure, which in turn alters insect communities.
+Over time, insect communities within high intensity burn scars can
+crash, leaving avian predators without important food resources
+\citep{nappi2010effect}. The Hayman Fire also resulted in the mortality
+of almost all trees in its path, particularly old-growth conifers
+\citep{fornwalt2016did}. Flammulated Owls have been shown to favor
+old-growth conifers for foraging in Colorado. According to one study,
+80\% of prey captures were in Ponderosa Pine or Douglas Fir trees, and
+the mean age of foraging trees was 199 years (compared to an overall
+forest mean of 111 years) \citep{reynolds1992flammulated}. If
 Flammulated Owls are adapting their behavior in response to changing
 prey availlability or foraging site availability, I would expect that
 the rate of prey deliveries to active nests would differ between the
@@ -184,7 +187,7 @@ The objectives for this analysis are to examine:
 \item
   How do prey delivery rates change throughout the night?
 \item
-  How do male and female nest provisioning differ?
+  How do male and female nest provisioning strategies differ?
 \item
   How is nest provisioning affected by high severity burns?
 \end{enumerate}
@@ -377,8 +380,8 @@ Zone 13N.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Get extent}
-\NormalTok{ext <-}\StringTok{ }\KeywordTok{st_bbox}\NormalTok{(boundary_sf)}
+\CommentTok{# Change boundary shapefile class from `sf` to `spatial`}
+\NormalTok{boundary_sp <-}\StringTok{ }\KeywordTok{as}\NormalTok{(boundary_sf, }\StringTok{"Spatial"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -388,9 +391,6 @@ Load in fire severity raster data:
 \begin{Highlighting}[]
 \CommentTok{# Load raster image}
 \NormalTok{severity <-}\StringTok{ }\KeywordTok{raster}\NormalTok{(}\StringTok{"../analysis/images/burn_severity/burn_severity.adf"}\NormalTok{)}
-
-\CommentTok{# Change boundary shapefile class from `sf` to `spatial`}
-\NormalTok{boundary_sp <-}\StringTok{ }\KeywordTok{as}\NormalTok{(boundary_sf, }\StringTok{"Spatial"}\NormalTok{)}
 
 \CommentTok{# Use fire boundary to crop fire severity raster}
 \NormalTok{severity_crop <-}\StringTok{ }\NormalTok{raster}\OperatorTok{::}\KeywordTok{crop}\NormalTok{(severity, boundary_sp)}
@@ -714,8 +714,6 @@ ciInc because no data is available for MGSA after this time.
     \DataTypeTok{ci_h =} \KeywordTok{c}\NormalTok{(ciM_nest[}\DecValTok{2}\NormalTok{,], ciF_nest[}\DecValTok{2}\NormalTok{,]),}
     \DataTypeTok{time =} \KeywordTok{c}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(meanM_nest)), }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(meanF_nest))),}
     \DataTypeTok{stage =} \StringTok{"Nestling"}\NormalTok{)}
-    
-\NormalTok{ciAll_sex <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(ciInc_sex, ciNest_sex)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1063,8 +1061,6 @@ Add CIs to a data frame.
     \DataTypeTok{ci_h =} \KeywordTok{c}\NormalTok{(ciHFSA_nest[}\DecValTok{2}\NormalTok{,], ciMGSA_nest[}\DecValTok{2}\NormalTok{,]),}
     \DataTypeTok{time =} \KeywordTok{c}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(meanHFSA_nest)), }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(meanMGSA_nest))),}
     \DataTypeTok{stage =} \StringTok{"Nestling"}\NormalTok{)}
-    
-\NormalTok{ciAll <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(ciInc, ciNest)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1261,16 +1257,30 @@ Despite habitat devastation, Flammulated Owls continued to nest in the
 Hayman Fire burn scar between 2004 and 2020 (Figure 1). Across study
 sites, males were primarily responsible for nest provisioning, while
 females were the sole incubators (Figure 2). Males delivered prey items
-to females during the incubation period. Once hatching occurred, females
-made some prey deliveries, but the average rate of female prey
-deliveries was significantly lower than that of male prey deliveries
-throughout the course of the night.
+to females during the incubation period, with mean prey deliveries at
+time = 235 and time = 250 showing no significant difference likely due
+to a small sample size paired with high variation at these late hours of
+the night. Once hatching occurred, females made some prey deliveries,
+but the average rate of female prey deliveries was significantly lower
+than that of male prey deliveries throughout the course of the night.
 
 Almost no mean prey delivery rates were significantly different between
-the HFSA and MGSA, with the exception of one time interval in the
-nestling stage (Figure 3). This does not appear to have biological
-significance, however, and would likely become insignificant with an
-increased sample size.
+the HFSA and MGSA, with the exception of time = 165 during the nestling
+stage (Figure 3). However, his does not appear to have biological
+significance and would likely become insignificant with an increased
+sample size.
+
+This study has shown that across study site, males are the primary nest
+provisioners, with females delivering small amounts of prey during the
+nestling season. Decreased habitat quality in the Hayman Fire scar may
+be putting more pressure on foraging males, who may have to travel
+further to locate adequate foraging sites, thus increasing energy
+demands. Although habitat quality continues to deteriorate, Flammulated
+Owls still return to the HFSA each year to breed. The specialized
+natural of their foraging habitat, combined with the males' inability to
+adapt nest provisioning behavior following large-scale disturbance, may
+be contributing to overall decreased annual survivorship for male
+Flammulated Owls breeding in the Hayman Fire burn area.
 
 \renewcommand\refname{References}
 \bibliography{references.bib}

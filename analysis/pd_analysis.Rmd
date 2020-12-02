@@ -6,7 +6,7 @@ output:
     latex_engine: xelatex
 title: "Nest Provisioning in a Fire Disturbed Landscape"
 author: "Eliza Stein"
-date: "11/8/2020"
+date: "12/3/2020"
 bibliography: references.bib
 csl: './apa.csl'
 editor_options:
@@ -181,8 +181,8 @@ Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N.
 # Load Boundary
 boundary_sf <- st_read("../analysis/images/hayman.shp")
 
-# Get extent
-ext <- st_bbox(boundary_sf)
+# Change boundary shapefile class from `sf` to `spatial`
+boundary_sp <- as(boundary_sf, "Spatial")
 
 ```
 
@@ -193,9 +193,6 @@ Load in fire severity raster data:
 
 # Load raster image
 severity <- raster("../analysis/images/burn_severity/burn_severity.adf")
-
-# Change boundary shapefile class from `sf` to `spatial`
-boundary_sp <- as(boundary_sf, "Spatial")
 
 # Use fire boundary to crop fire severity raster
 severity_crop <- raster::crop(severity, boundary_sp)
