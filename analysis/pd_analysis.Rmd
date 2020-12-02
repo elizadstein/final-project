@@ -54,7 +54,6 @@ All relative paths begin at the final-project/analysis subdirectory.
 
 # Data manipulation and visualization
 install.packages("knitr", repos='http://cran.us.r-project.org')
-install.packages("tinytex", repos='http://cran.us.r-project.org')
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
 install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
@@ -76,8 +75,6 @@ knitr::opts_chunk$set(message = FALSE)
 
 # Data manipulation and visualization
 library(knitr)
-library(tinytex)
-tinytex::install_tinytex()
 library(tidyverse)
 library(gridExtra)
 
