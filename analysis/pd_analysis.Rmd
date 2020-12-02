@@ -17,14 +17,14 @@ editor_options:
 
 Fire plays an important role as a consistent disturbance in maintaining open stands of old-growth Ponderosa Pine (*Pinus ponderosa*) forests by helping to eliminate understory and limit fuel loads [@veblen2000climatic]. Before human intervention, Ponderosa Pine forests naturally underwent forest fires in 5-50 year intervals [@veblen2000climatic]. Over the past century, however, tree planting initiatives and increased implementation of fire suppression have led to increased density of stands [@griffis2001understory], making forest stands that are already drought stressed even more susceptible to high severity crown fires [@veblen2000climatic]. In 2002, a human-caused wildfire, the Hayman Fire, burned 138,000 acres of old-growth Ponderosa Pine forests in Colorado's Pike National Forest [@graham2003hayman]. It was classified as having "uncharacteristic stand-replacing severity," and more than 96% of trees (mostly Ponderosa Pine and Douglas Fir) in the burn footprint did not survive [@fornwalt2016did]. About 50% of these trees were over 200 years old.
 
-The Flammulated Owl (*Psiloscops flammeolus*) is a territorial, insectivorous, and nocturnal raptor native to Yellow Pine forests in portions of the Rocky Mountains, Sierra Nevada Mountains, and the Occidental Mountains [@linkhart2013flammulated]. The diet of the owl primarily consists of moths native to these regions [@linkhart2013flammulated]. As a highly specialized secondary cavity nesting raptor, the Flammulated Owl is deemed an indicator species. This species relies on old-growth mixed Yellow Pine forests for breeding and wintering habitats and primarily forages on foliage-gleaning moths [@reynolds1992flammulated]. The Hayman Fire scar, which was previously dominated by prime Flammulated Owl habitat, continues to attract breeding individuals, but their success in this sub-optimal habitat is not well supported. Survival models show that annual adult Flammulated Owl suvival in the Hayman Fire burn scar is currently lower than in a nearby control site, and adult annual survival in the burn scar appears to be decreasing each year following the fire (Yanco et al. unpublished data). 
+The Flammulated Owl (*Psiloscops flammeolus*) is a territorial, insectivorous, and nocturnal raptor native to Yellow Pine forests in portions of the Rocky Mountains, Sierra Nevada Mountains, and the Occidental Mountains [@linkhart2013flammulated]. The diet of the owl primarily consists of moths native to these regions [@linkhart2013flammulated]. As a highly specialized secondary cavity nesting raptor, the Flammulated Owl is deemed an indicator species. This species relies on old-growth mixed Yellow Pine forests for breeding and wintering habitats and primarily forages on foliage-gleaning moths [@reynolds1992flammulated]. The Hayman Fire scar, which was previously dominated by prime Flammulated Owl habitat, continues to attract breeding individuals, but their success in this sub-optimal habitat is not well supported. Survival models show that annual adult Flammulated Owl survival in the Hayman Fire burn scar is currently lower for males than in a nearby control site, and adult annual survival in the burn scar appears to be decreasing each year following the fire (Yanco et al. unpublished data). 
 
-Here, I examine one possible explanation for decreased survivorship in the Hayman Fire burn area: foraging ability. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources [@nappi2010effect]. The Hayman Fire also resulted in the mortality of almost all trees in its path, particularly old-growth conifers [@fornwalt2016did]. Flammulated Owls have been shown to favor old-growth conifers for foraging in Colorado. According to one study, 80% of prey captures were in Ponderosa Pine or Douglas Fir trees, and the mean age of foraging trees was 199 years (compared to an overall forest mean of 111 years) [@reynolds1992flammulated]. If Flammulated Owls are adapting their behavior in response to changing prey availlability or foraging site availability, I would expect that the rate of prey deliveries to active nests would differ between the Hayman Fire burn scar and nearby unburned sites [@zarybnicka2009tengmalm]. If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which have not historically occupied landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes. This would make them highly sensitive to large-scale disturbances that affect foraging at important times, such as during the breeding season.
+Here, I examine one possible explanation for decreased male survivorship in the Hayman Fire burn area: foraging ability. Observational data suggests that males are the primary nest provisioners throughout the breeding season, meaning that they could be suffereing from increased energy demands more thatn females. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources [@nappi2010effect]. The Hayman Fire also resulted in the mortality of almost all trees in its path, particularly old-growth conifers [@fornwalt2016did]. Flammulated Owls have been shown to favor old-growth conifers for foraging in Colorado. According to one study, 80% of prey captures were in Ponderosa Pine or Douglas Fir trees, and the mean age of foraging trees was 199 years (compared to an overall forest mean of 111 years) [@reynolds1992flammulated]. If Flammulated Owls are adapting their behavior in response to changing prey availlability or foraging site availability, I would expect that the rate of prey deliveries to active nests would differ between the Hayman Fire burn scar and nearby unburned sites [@zarybnicka2009tengmalm]. If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which have not historically occupied landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes. This would make them highly sensitive to large-scale disturbances that affect foraging at important times, such as during the breeding season.
 
 The objectives for this analysis are to examine:
 
 1. How do prey delivery rates change throughout the night?
-2. How do male and female nest provisioning differ?
+2. How do male and female nest provisioning strategies differ?
 3. How is nest provisioning affected by high severity burns?
 
 
@@ -54,6 +54,7 @@ All relative paths begin at the final-project/analysis subdirectory.
 
 # Data manipulation and visualization
 install.packages("knitr", repos='http://cran.us.r-project.org')
+install.packages("tinytex", repos='http://cran.us.r-project.org')
 install.packages("tidyverse", repos='http://cran.us.r-project.org')
 install.packages("gridExtra", repos='http://cran.us.r-project.org')
 
@@ -62,6 +63,7 @@ install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.r
 install.packages("raster", repos='http://cran.us.r-project.org')
 install.packages("sf", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
 install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
+
 ```
 
 ```{r set_message}
@@ -74,6 +76,8 @@ knitr::opts_chunk$set(message = FALSE)
 
 # Data manipulation and visualization
 library(knitr)
+library(tinytex)
+tinytex::install_tinytex()
 library(tidyverse)
 library(gridExtra)
 
@@ -229,7 +233,7 @@ sev_bound_plot <- severity_plot +
 
 Plot nest locations (n = 45) on Hayman Fire severity map:
 
-```{r plot_severity, fig.path = "../manuscript/figures", fig.cap = "Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
+```{r plot_severity, fig.path = "../manuscript/figures/", fig.cap = "Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
 # Read in nest tree data
 nest_dat <- read.csv("../data/nest_trees.csv")
 
@@ -400,8 +404,6 @@ ciNest_sex <- data.frame(
     ci_h = c(ciM_nest[2,], ciF_nest[2,]),
     time = c(as.numeric(rownames(meanM_nest)), as.numeric(rownames(meanF_nest))),
     stage = "Nestling")
-    
-ciAll_sex <- rbind(ciInc_sex, ciNest_sex)
 
 ```
 
@@ -488,7 +490,7 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r plot_sex, fig.path = "../manuscript/figures", fig.cap = "Figure 2. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r plot_sex, fig.path = "../manuscript/figures/", fig.cap = "Figure 2. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_sex, plotNest_sex)
 
@@ -617,8 +619,7 @@ ciNest <- data.frame(
     ci_h = c(ciHFSA_nest[2,], ciMGSA_nest[2,]),
     time = c(as.numeric(rownames(meanHFSA_nest)), as.numeric(rownames(meanMGSA_nest))),
     stage = "Nestling")
-    
-ciAll <- rbind(ciInc, ciNest)
+
 
 ```
 
@@ -703,7 +704,7 @@ plotNest_site <- ggplot(data = ciNest) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r plot_site, fig.path = "../manuscript/figures", fig.cap = "Figure 3. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r plot_site, fig.path = "../manuscript/figures/", fig.cap = "Figure 3. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_site, plotNest_site)
 
@@ -713,8 +714,11 @@ grid.arrange(plotInc_site, plotNest_site)
 
 # Discussion
 
+Despite habitat devastation, Flammulated Owls continued to nest in the Hayman Fire burn scar between 2004 and 2020 (Figure 1). Across study sites, males were primarily responsible for nest provisioning, while females were the sole incubators (Figure 2). Males delivered prey items to females during the incubation period, with mean prey deliveries at time = 235 and time = 250 showing no significant difference likely due to a small sample size paired with high variation at these late hours of the night. Once hatching occurred, females made some prey deliveries, but the average rate of female prey deliveries was significantly lower than that of male prey deliveries throughout the course of the night. 
 
+Almost no mean prey delivery rates were significantly different between the HFSA and MGSA, with the exception of time = 165 during the nestling stage (Figure 3). However, his does not appear to have biological significance and would likely become insignificant with an increased sample size.
 
+This study has shown that across study site, males are the primary nest provisioners, with females delivering small amounts of prey during the nestling season. Decreased habitat quality in the Hayman Fire scar may be putting more pressure on foraging males, who may have to travel further to locate adequate foraging sites, thus increasing energy demands. Although habitat quality continues to deteriorate, Flammulated Owls still return to the HFSA each year to breed. The specialized natural of their foraging habitat, combined with the males' inability to adapt nest provisioning behavior following large-scale disturbance, may be contributing to overall decreased annual survivorship for male Flammulated Owls breeding in the Hayman Fire burn area.
 
 
 

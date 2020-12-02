@@ -5,4 +5,4 @@ manuscript.html:
 	Rscript -e 'rmarkdown::render("analysis/pd_analysis.Rmd", output_format = "html_document", output_dir = "manuscript", output_file = "manuscript")'
 	
 clean:
-	rm -rf *.pdf *.html
+	rm -rf manuscript/*.pdf manuscript/*.html manuscript/*.tex

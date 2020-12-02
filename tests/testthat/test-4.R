@@ -1,12 +1,11 @@
-context("pdStage_sex column numbers")
+context("pd table column names")
 
 test_that("pd_DFs_sex", {
-  expect_true(unique(pdM_inc$stage == "incubation"))
-  expect_true(unique(pdM_inc$sex == "M"))
-  expect_true(unique(pdF_inc$stage == "incubation"))
-  expect_true(unique(pdF_inc$sex == "F"))
-  expect_true(unique(pdM_nest$stage == "nestling"))
-  expect_true(unique(pdM_inc$sex == "M"))
-  expect_true(unique(pdF_inc$stage == "nestling"))
-  expect_true(unique(pdF_inc$sex == "F"))
+  expect_equal(colnames(pdM_inc), colnames(pdF_inc))
+  expect_equal(colnames(pdM_nest), colnames(pdF_nest))
+})
+
+test_that("pd_DFs_site", {
+  expect_equal(colnames(pdHFSA_inc), colnames(pdMGSA_inc))
+  expect_equal(colnames(pdHFSA_nest), colnames(pdMGSA_nest))
 })
