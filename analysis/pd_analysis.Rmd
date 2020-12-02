@@ -19,7 +19,7 @@ Fire plays an important role as a consistent disturbance in maintaining open sta
 
 The Flammulated Owl (*Psiloscops flammeolus*) is a territorial, insectivorous, and nocturnal raptor native to Yellow Pine forests in portions of the Rocky Mountains, Sierra Nevada Mountains, and the Occidental Mountains [@linkhart2013flammulated]. The diet of the owl primarily consists of moths native to these regions [@linkhart2013flammulated]. As a highly specialized secondary cavity nesting raptor, the Flammulated Owl is deemed an indicator species. This species relies on old-growth mixed Yellow Pine forests for breeding and wintering habitats and primarily forages on foliage-gleaning moths [@reynolds1992flammulated]. The Hayman Fire scar, which was previously dominated by prime Flammulated Owl habitat, continues to attract breeding individuals, but their success in this sub-optimal habitat is not well supported. Survival models show that annual adult Flammulated Owl suvival in the Hayman Fire burn scar is currently lower than in a nearby control site, and adult annual survival in the burn scar appears to be decreasing each year following the fire (Yanco et al. unpublished data). 
 
-Here, I examine one possible explanation for increased mortality in HFSA: prey availability. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources [@nappi2010effect]. If Flammulated Owls are adapting their behavior in response to changing prey availability, I would expect that the rate of prey deliveries to active nests would increase or decrease (increase if prey is lower quality, decrease if prey is more scarce or difficult to detect) [@zarybnicka2009tengmalm]. If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which do not occupy landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes. This would make them highly sensitive to large-scale disturbances that affect foraging at important times, such as during the breeding season.
+Here, I examine one possible explanation for decreased survivorship in the Hayman Fire burn area: foraging ability. High severity burns dramatically alter vegetation structure, which in turn alters insect communities. Over time, insect communities within high intensity burn scars can crash, leaving avian predators without important food resources [@nappi2010effect]. The Hayman Fire also resulted in the mortality of almost all trees in its path, particularly old-growth conifers [@fornwalt2016did]. Flammulated Owls have been shown to favor old-growth conifers for foraging in Colorado. According to one study, 80% of prey captures were in Ponderosa Pine or Douglas Fir trees, and the mean age of foraging trees was 199 years (compared to an overall forest mean of 111 years) [@reynolds1992flammulated]. If Flammulated Owls are adapting their behavior in response to changing prey availlability or foraging site availability, I would expect that the rate of prey deliveries to active nests would differ between the Hayman Fire burn scar and nearby unburned sites [@zarybnicka2009tengmalm]. If Flammulated Owls are not adapting their behavior, this could mean that prey availability has either not changed or, more likely, that Flammulated Owls, which have not historically occupied landscapes prone to high severity burns, do not adapt their behavior in response to large-scale landscape changes. This would make them highly sensitive to large-scale disturbances that affect foraging at important times, such as during the breeding season.
 
 The objectives for this analysis are to examine:
 
@@ -42,11 +42,29 @@ First, average prey delivery rates for both males and females were compared at 1
 Then, the data was filtered to include only HFSA, our treatment area, and MGSA, an unburned study site ~5 miles from HFSA, with similar habitat. Means and bootstrap confidence intervals were plotted using the above technique.
 
 
-# Analysis
 
 # Initialization
 
 All relative paths begin at the final-project/analysis subdirectory.
+
+
+## Required Packages
+
+```{r install_spatial_packages, include=FALSE}
+
+# Data manipulation and visualization
+install.packages("knitr", repos='http://cran.us.r-project.org')
+install.packages("plyr", repos='http://cran.us.r-project.org')
+install.packages("dplyr", repos='http://cran.us.r-project.org')
+install.packages("tidyr", repos='http://cran.us.r-project.org')
+install.packages("ggplot2", repos='http://cran.us.r-project.org')
+
+# Spatial data analysis
+install.packages("raster", repos='http://cran.us.r-project.org')
+install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+install.packages("sf", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
+install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
+```
 
 ```{r set_message}
 
@@ -54,43 +72,20 @@ knitr::opts_chunk$set(message = FALSE)
 
 ```
 
-## Required Packages
-
-```{r install_spatial_packages, include=FALSE}
-# LaTex
-#install.packages("tinytex")
+```{r load_packages}
 
 # Data manipulation and visualization
-install.packages("tidyverse", repos='http://cran.us.r-project.org')
-install.packages("gridExtra", repos='http://cran.us.r-project.org')
+library(knitr)
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 
-```
-
-```{r}
 # Spatial data analysis
-install.packages("sp", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
-install.packages("raster", repos='http://cran.us.r-project.org')
-install.packages("rgdal", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
-install.packages("sf", repos=c('http://R-Forge.R-project.org', 'http://cran.rstudio.com'))
-install.packages("RColorBrewer", repos='http://cran.us.r-project.org')
-```
-
-```{r load_basic_packages}
-
-# Data manipulation and visualization
-library(tidyverse)
-library(gridExtra)
-
-```
-
-```{r load_spatial_packages}
-# Spatial data analysis
-library(sp)
 library(raster)
 library(rgdal)
 library(sf)
 library(RColorBrewer)
-#library(ggmap)
 
 ```
 
@@ -98,7 +93,7 @@ library(RColorBrewer)
 
 ```{r setwd, eval=FALSE, include=FALSE}
 
-setwd("~/final-project/analysis)
+setwd("../analysis")
 
 ```
 
@@ -148,6 +143,7 @@ testNormality <- function(dat, margin = 2) {
   norms <- apply(dat, margin, FUN = shapiro.test)
   return(sapply(norms, function(x){x[["p.value"]]}))
 }
+
 ```
 
 testWilcox runs a Wilcoxon test on the nth columns of two different data frames (i.e. df1[1] and df2[1], df1[2] and df2[2], etc.). We add the argument exact = FALSE to suppress the Warning message that exact p.values with ties can't be computed (warning comes from assumption that values are continuous). This is useful in testing for difference between prey delivery observations at time = 15 in one study site and at time = 15 in a second study site, when the data are not normally distributed.
@@ -176,6 +172,8 @@ testWilcox <- function(a, b){
 
 
 # Study Area
+
+The Hayman Fire Study Area (HFSA) is located in central Colorado, USA (Figure 1). Missouri Gulch Study Area (MGSA) is located 5 miles east of the eastern edge of the fire scar. 45 nests were observed in HFSA and MGSA between 2004 and 2020. A total of 731 observations were recorded in HFSA and 530 observations were recorded in MGSA.
 
 ## Hayman Fire Study Area (HFSA)
 
@@ -235,31 +233,18 @@ sev_bound_plot <- severity_plot +
 
 Plot nest locations (n = 45) on Hayman Fire severity map:
 
-```{r plot_severity}
+```{r plot_severity, fig.cap = "Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
 # Read in nest tree data
 nest_dat <- read.csv("../data/nest_trees.csv")
 
 # Plot nest trees over Hayman burn map
 sev_bound_plot +
-  geom_point(data = nest_dat, mapping = aes(x = x_coord, y = y_coord), color = "red") +
+  geom_point(data = nest_dat, mapping = aes(x = x_coord, y = y_coord), color = "blue") +
   ggtitle("Hayman Fire Nest Sites") +
   theme_void() +
   theme(plot.title = element_text(hjust = 0.5))
 
 
-```
-
-
-Plot Hayman over CO basemap (maybe remove):
-
-```{r basemap, eval=FALSE, include=FALSE}
-# Get extent of Hayman from shapefile
-st_bbox(boundary_sf)
-
-co_basemap <- get_map(location=c(left = -46.18558, bottom = 43.156723, right = -49.08987, top = 43.524593), zoom=11, maptype = 'terrain-background', source = 'stamen')
-
-
-plot(co_basemap)
 ```
 
 
@@ -468,7 +453,7 @@ From the Wilcoxon tests, we see that all median time intervals during the nestli
 Incubation (including star indicating non-significant Wilcoxon test at t = 225 and t = 240):
 ```{r plotInc_sex}
 
-plotInc_sex <- ggplot(data = ciInc_sex) +
+ggplot(data = ciInc_sex) +
   geom_point(aes(x = time, y = mean, color = sex, group = sex),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
@@ -478,16 +463,16 @@ plotInc_sex <- ggplot(data = ciInc_sex) +
        title = "Incubation", color = "Sex") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5)) +
-  geom_point(aes(x = 225, y = 4.5), shape = 8, stroke = 0.1) +
-  geom_point(aes(x = 240, y = 3.5), shape = 8, stroke = 0.1)
+  geom_point(aes(x = 225, y = 3.0), shape = 8, stroke = 0.1) +
+  geom_point(aes(x = 240, y = 2.5), shape = 8, stroke = 0.1)
 
 ```
 
 
 Nestling:
-```{r plotNest_sex}
+```{r plotNest_sex, fig.cap = "Figure 2. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
-plotNest_sex <- ggplot(data = ciNest_sex) +
+ggplot(data = ciNest_sex) +
   geom_point(aes(x = time, y = mean, color = sex, group = sex),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = sex, 
@@ -503,7 +488,7 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r final_plot_sex, fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r final_plot_sex, eval=FALSE, fig.cap=, include=FALSE}
 
 grid.arrange(plotInc_sex, plotNest_sex)
 
@@ -659,14 +644,12 @@ All vectors in each list are significantly different from null hypothesis of Sha
 
 # Incubation Stage
 wilcox_inc <- testWilcox(pdMGSA_inc, pdHFSA_inc)
-print(wilcox_inc)
 
 any(wilcox_inc$values <= 0.05) #test if any p.values are significantly different: FALSE
 all(wilcox_inc$values > 0.05) #test if all p.values are not significant (double-checking first logical expression's validity): TRUE
 
 # Nestling Stage
 wilcox_nest <- testWilcox(pdMGSA_nest, pdHFSA_nest)
-print(wilcox_nest)
 
 any(wilcox_nest$values <= 0.05) #test if any p.values are significantly different: TRUE
 dplyr::filter(wilcox_nest, values <= 0.05) #print which row has p.value that is significantly different
@@ -678,10 +661,11 @@ From the Wilcoxon tests, we see that no median time intervals during the incubat
 
 ## Plot
 
-Incubation:
-```{r plotInc_site}
+Mean prey deliveries throughout night in incubation and nestling stage (including star indicating significant Wilcoxon test at t = 165):
 
-plotInc_site <- ggplot(data = ciInc) +
+```{r plot_site, fig.cap = "Figure 3. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+
+ggplot(data = ciInc) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -692,13 +676,8 @@ plotInc_site <- ggplot(data = ciInc) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 
-```
 
-
-Nestling (including star indicating significant Wilcoxon test at t = 165):
-```{r plotNest_site}
-
-plotNest_site <- ggplot(data = ciNest) +
+ggplot(data = ciNest) +
   geom_point(aes(x = time, y = mean, color = study_area, group = study_area),
              position = position_dodge(width=0.75)) +
   geom_errorbar(aes(x=time, ymax = ci_h, ymin=ci_l, color = study_area, 
@@ -715,7 +694,7 @@ plotNest_site <- ggplot(data = ciNest) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r final_plot_site, fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r final_plot_site, eval=FALSE, fig.cap=, include=FALSE}
 
 grid.arrange(plotInc_site, plotNest_site)
 
@@ -723,33 +702,11 @@ grid.arrange(plotInc_site, plotNest_site)
 
 
 
+# Discussion
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# References
