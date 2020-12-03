@@ -13,6 +13,9 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+
+
 # Introduction
 
 Fire plays an important role as a consistent disturbance in maintaining open stands of old-growth Ponderosa Pine (*Pinus ponderosa*) forests by helping to eliminate understory and limit fuel loads [@veblen2000climatic]. Before human intervention, Ponderosa Pine forests naturally underwent forest fires in 5-50 year intervals [@veblen2000climatic]. Over the past century, however, tree planting initiatives and increased implementation of fire suppression have led to increased density of stands [@griffis2001understory], making forest stands that are already drought stressed even more susceptible to high severity crown fires [@veblen2000climatic]. In 2002, a human-caused wildfire, the Hayman Fire, burned 138,000 acres of old-growth Ponderosa Pine forests in Colorado's Pike National Forest [@graham2003hayman]. It was classified as having "uncharacteristic stand-replacing severity," and more than 96% of trees (mostly Ponderosa Pine and Douglas Fir) in the burn footprint did not survive [@fornwalt2016did]. About 50% of these trees were over 200 years old.
@@ -48,7 +51,7 @@ Then, the data was filtered to include only HFSA, our treatment area, and MGSA, 
 All relative paths begin at the final-project/analysis subdirectory.
 
 
-## Required Packages
+### Required Packages
 
 ```{r install_spatial_packages, include=FALSE}
 
@@ -89,16 +92,9 @@ library(RColorBrewer)
 
 ```
 
-## Working directory:
-
-```{r setwd, eval=FALSE, include=FALSE}
-
-setwd("../analysis")
-
-```
 
 
-## Custom functions:
+### Custom functions
 
 getCI is designed to generate bootstrap confidence intervals from a given vector.
 
@@ -124,7 +120,7 @@ getCI <- function(vec, n_samp=1000) {
 
 ```
 
-testNormality runs a Shapiro-Wilk test on each time interval in a pd data frame and returns p values based on the null hypothesis that the data is normally distributed. If p < 0.05, data is not normally distributed.
+testNormality runs a Shapiro-Wilk test on each time interval in a pd data.frame and returns p values based on the null hypothesis that the data is normally distributed. If p < 0.05, data is not normally distributed.
 
 ```{r testNormality}
 #' testNormality
@@ -146,7 +142,7 @@ testNormality <- function(dat, margin = 2) {
 
 ```
 
-testWilcox runs a Wilcoxon test on the nth columns of two different data frames (i.e. df1[1] and df2[1], df1[2] and df2[2], etc.). We add the argument exact = FALSE to suppress the Warning message that exact p.values with ties can't be computed (warning comes from assumption that values are continuous). This is useful in testing for difference between prey delivery observations at time = 15 in one study site and at time = 15 in a second study site, when the data are not normally distributed.
+testWilcox runs a Wilcoxon test on the nth columns of two different data.frames (i.e. df1[1] and df2[1], df1[2] and df2[2], etc.). We add the argument exact = FALSE to suppress the Warning message that exact p.values with ties can't be computed (warning comes from assumption that values are continuous). This is useful in testing for difference between prey delivery observations at time = 15 in one study site and at time = 15 in a second study site, when the data are not normally distributed.
 
 ```{r testWilcox}
 
@@ -175,7 +171,7 @@ testWilcox <- function(a, b){
 
 The Hayman Fire Study Area (HFSA) is located in central Colorado, USA (Figure 1). Missouri Gulch Study Area (MGSA) is located 5 miles east of the eastern edge of the fire scar. 45 nests were observed in HFSA and MGSA between 2004 and 2020. A total of 731 observations were recorded in HFSA and 530 observations were recorded in MGSA.
 
-## Hayman Fire Study Area (HFSA)
+### Hayman Fire Study Area (HFSA)
 
 Load in fire scar polygon. Projected coordinate reference system: UTM Zone 13N. 
 
@@ -230,7 +226,7 @@ sev_bound_plot <- severity_plot +
 
 Plot nest locations (n = 45) on Hayman Fire severity map:
 
-```{r plot_severity, fig.path = "../manuscript/figures/", fig.cap = "Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
+```{r plot_severity, fig.path = "../manuscript/figures/", fig.cap = "Flammulated Owl nests sampled in the Hayman Fire burn scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn severity."}
 # Read in nest tree data
 nest_dat <- read.csv("../data/nest_trees.csv")
 
@@ -250,7 +246,7 @@ sev_bound_plot +
 
 First, we compared average prey delivery rates for males and females at all study sties at fifteen minute intervals throughout the night.
 
-## Read in Data
+### Read in Data
 
 Load prey delivery data.
 
@@ -303,7 +299,7 @@ pdClean$nest_age <- as.integer(pdClean$nest_age)
 ```
 
 
-## Organize Data
+### Organize Data
 
 Data was separated by sex (M vs. F) and by incubation vs. nestling stage. Nestling period is defined as nest_age >= 22 days. If nest age was not indicated in original dataset, field notes were used to determine whether nest was in incubation (all eggs) or nestling (at least one nestling) stage. For these records, the following values were manually input: nest_age = 0 for incubation or nest_age = 100 for nestling, so that this data could be easily separated from known nest age.  If it was later determined that nest had been predated before observation, "pred" was entered. If the nest stage could not be determined, it was left blank."pred" and "" values were converted to NA earlier when this column was converted to numeric.
 
@@ -343,7 +339,7 @@ pdF_nest <- pdStage_sex %>%
 ```
 
 
-## Mean PD tables
+### Mean PD tables
 
 Create four stand-alone data.frames, one for M (incubation), one for M (nestling), one for F (incubation), and one for F (nestling). These will be used for t-tests.
 
@@ -368,7 +364,7 @@ meanF_nest <- data.frame(
 ```
 
 
-## Calculate confidence intervals
+### Calculate confidence intervals
 
 Apply getCI function across data.frames for each sex and stage.
 
@@ -405,7 +401,7 @@ ciNest_sex <- data.frame(
 ```
 
 
-## Test for Difference
+### Test for Difference
 
 Test for normality for each time interval in M_inc, M_nest, and F_nest (excluded pdF_inc because all values = 0, as female did not deliver prey while incubating).
 
@@ -431,23 +427,23 @@ All vectors in each list are significantly different from null hypothesis of Sha
 wilcox_inc_sex <- testWilcox(pdM_inc, pdF_inc)
 print(wilcox_inc_sex)
 
-any(wilcox_inc_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
-all(wilcox_inc_sex$values <= 0.05) #test if all p.values are significantly different: FALSE
-dplyr::filter(wilcox_inc_sex, values <= 0.05) #print which rows have p.value that is significantly different
+any(wilcox_inc_sex$values <= 0.05) #test if any p.values are sig diff
+all(wilcox_inc_sex$values <= 0.05) #test if all p.values are sig diff
+dplyr::filter(wilcox_inc_sex, values <= 0.05) #print which rows have sig diff p.value 
 
 # Nestling Stage
 wilcox_nest_sex <- testWilcox(pdM_nest, pdF_nest)
 print(wilcox_nest_sex)
 
-any(wilcox_nest_sex$values <= 0.05) #test if any p.values are significantly different: TRUE
-all(wilcox_nest_sex$values <= 0.05) #test if all p.values are significantly different: TRUE
+any(wilcox_nest_sex$values <= 0.05) #test if any p.values are sig diff
+all(wilcox_nest_sex$values <= 0.05) #test if all p.values are sig diff
 
 ```
 
 From the Wilcoxon tests, we see that all median time intervals during the nestling stage are significantly different between males and females. However, during the incubation stage, median prey delivery rates at time = 2255 and time = 240 are not significantly different between males and females.
 
 
-## Plot
+### Plot
 
 Incubation (including star indicating non-significant Wilcoxon test at t = 225 and t = 240):
 ```{r plotInc_sex}
@@ -487,7 +483,7 @@ plotNest_sex <- ggplot(data = ciNest_sex) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r plot_sex, fig.path = "../manuscript/figures/", fig.cap = "Figure 2. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r plot_sex, fig.path = "../manuscript/figures/", fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Males are shown in bue and females in red. Stars indicate non-significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_sex, plotNest_sex)
 
@@ -508,13 +504,11 @@ pdHM <- pdClean %>%
 
 
 
-## Organize Data
+### Organize Data
 
-Data was separated by study site (HFSA vs. MGSA) and by incubation vs. nestling stage. 
+Data was separated by study site (HFSA vs. MGSA) and by incubation vs. nestling stage. Since the last observation for HFSA is at time = 240, we'll end the first data.frame there.
 
-since the last observation for HFSA is at time = 240, we'll end both datasets there.
-
-First, create data frame with PDs for whole dataset, then broken down by each study site and stage. End incubation data frames at t = 180 and nesting data frames at t = 240 because this is the maximum time when there is data for both sites.
+Then, create data.frames for each study site and stage. End incubation data.frames at t = 180 and nestling data.frames at t = 240 because this is the maximum time when there is data for both sites.
 
 ```{r, pd_DFs_site}
 
@@ -557,7 +551,7 @@ pdMGSA_nest <- pdStage_site %>%
 
 
 
-## Mean PD tables
+### Mean PD tables
 
 Create four stand-alone data.frames, one for HFSA (incubation), one for HFSA (nestling), one for MGSA (incubation), and one for MGSA (nestling).
 
@@ -583,7 +577,7 @@ meanMGSA_nest <- data.frame(
 
 
 
-## Calculate confidence intervals
+### Calculate confidence intervals
 
 Apply getCI across each data.frame, taking each time interval as vector.
 
@@ -596,7 +590,7 @@ ciMGSA_nest <- apply(pdMGSA_nest, 2, FUN = getCI)
 ```
 
 
-Add CIs to a data frame. 
+Add CIs to a data.frame. 
 
 ```{r ciDF_site}
 
@@ -621,7 +615,7 @@ ciNest <- data.frame(
 ```
 
 
-## Test for Difference
+### Test for Difference
 
 Test for normality for each time interval in pdMGSA_inc, pdMGSA_nest, pdHFSA_inc, and pdHFSA_nest.
 
@@ -646,22 +640,22 @@ All vectors in each list are significantly different from null hypothesis of Sha
 wilcox_inc_site <- testWilcox(pdMGSA_inc, pdHFSA_inc)
 print(wilcox_inc_site)
 
-any(wilcox_inc_site$values <= 0.05) #test if any p.values are significantly different: FALSE
-all(wilcox_inc_site$values > 0.05) #test if all p.values are not significant (double-checking first logical expression's validity): TRUE
+any(wilcox_inc_site$values <= 0.05) #test if any p.values are sig dif
+all(wilcox_inc_site$values > 0.05) #test if all p.values are not significant 
 
 # Nestling Stage
 wilcox_nest_site <- testWilcox(pdMGSA_nest, pdHFSA_nest)
-print(wilcox_nest_site)
+print(wilcox_inc_site)
 
-any(wilcox_nest_site$values <= 0.05) #test if any p.values are significantly different: TRUE
-dplyr::filter(wilcox_nest_site, values <= 0.05) #print which row has p.value that is significantly different
+any(wilcox_nest_site$values <= 0.05) #test if any p.values are sig diff
+dplyr::filter(wilcox_nest_site, values <= 0.05) #print which row has sig diff p.value
 
 ```
 
 From the Wilcoxon tests, we see that no median time intervals during the incubation stage are different between MGSA and HFSA. However, during the nestling stage, median prey delivery rates at time = 165 are significantly different between MGSA and HFSA.
 
 
-## Plot
+### Plot
 
 Mean prey deliveries throughout night in incubation stage:
 
@@ -701,7 +695,7 @@ plotNest_site <- ggplot(data = ciNest) +
 
 The final plot compares both incubation and nestling stages.
 
-```{r plot_site, fig.path = "../manuscript/figures/", fig.cap = "Figure 3. Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
+```{r plot_site, fig.path = "../manuscript/figures/", fig.cap = "Mean prey deliveries during the incubation stage (top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant differences in medians based on unpaired two-sample Wilcoxon tests."}
 
 grid.arrange(plotInc_site, plotNest_site)
 

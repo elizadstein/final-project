@@ -235,7 +235,7 @@ plotted using the above technique.
 All relative paths begin at the final-project/analysis subdirectory.
 
 \hypertarget{required-packages}{%
-\subsection{Required Packages}\label{required-packages}}
+\subsubsection{Required Packages}\label{required-packages}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -249,6 +249,8 @@ All relative paths begin at the final-project/analysis subdirectory.
 \KeywordTok{library}\NormalTok{(knitr)}
 \KeywordTok{library}\NormalTok{(tidyverse)}
 \KeywordTok{library}\NormalTok{(gridExtra)}
+\KeywordTok{library}\NormalTok{(tinytex)}
+\NormalTok{tinytex}\OperatorTok{::}\KeywordTok{install_tinytex}\NormalTok{()}
 
 \CommentTok{# Spatial data analysis}
 \KeywordTok{library}\NormalTok{(rgdal)}
@@ -258,11 +260,8 @@ All relative paths begin at the final-project/analysis subdirectory.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{working-directory}{%
-\subsection{Working directory:}\label{working-directory}}
-
 \hypertarget{custom-functions}{%
-\subsection{Custom functions:}\label{custom-functions}}
+\subsubsection{Custom functions}\label{custom-functions}}
 
 getCI is designed to generate bootstrap confidence intervals from a
 given vector.
@@ -290,7 +289,7 @@ given vector.
 \end{Shaded}
 
 testNormality runs a Shapiro-Wilk test on each time interval in a pd
-data frame and returns p values based on the null hypothesis that the
+data.frame and returns p values based on the null hypothesis that the
 data is normally distributed. If p \textless{} 0.05, data is not
 normally distributed.
 
@@ -315,8 +314,8 @@ normally distributed.
 \end{Highlighting}
 \end{Shaded}
 
-testWilcox runs a Wilcoxon test on the nth columns of two different data
-frames (i.e.~df1{[}1{]} and df2{[}1{]}, df1{[}2{]} and df2{[}2{]},
+testWilcox runs a Wilcoxon test on the nth columns of two different
+data.frames (i.e.~df1{[}1{]} and df2{[}1{]}, df1{[}2{]} and df2{[}2{]},
 etc.). We add the argument exact = FALSE to suppress the Warning message
 that exact p.values with ties can't be computed (warning comes from
 assumption that values are continuous). This is useful in testing for
@@ -356,7 +355,7 @@ MGSA between 2004 and 2020. A total of 731 observations were recorded in
 HFSA and 530 observations were recorded in MGSA.
 
 \hypertarget{hayman-fire-study-area-hfsa}{%
-\subsection{Hayman Fire Study Area
+\subsubsection{Hayman Fire Study Area
 (HFSA)}\label{hayman-fire-study-area-hfsa}}
 
 Load in fire scar polygon. Projected coordinate reference system: UTM
@@ -441,8 +440,8 @@ Plot nest locations (n = 45) on Hayman Fire severity map:
 \begin{figure}
 \centering
 \includegraphics{../manuscript/figures/plot_severity-1.pdf}
-\caption{Figure 1. Flammulated Owl nests sampled in the Hayman Fire burn
-scar (blue) plotted over Normalized Burn Ratios (NBR) depicting burn
+\caption{Flammulated Owl nests sampled in the Hayman Fire burn scar
+(blue) plotted over Normalized Burn Ratios (NBR) depicting burn
 severity.}
 \end{figure}
 
@@ -453,7 +452,7 @@ First, we compared average prey delivery rates for males and females at
 all study sties at fifteen minute intervals throughout the night.
 
 \hypertarget{read-in-data}{%
-\subsection{Read in Data}\label{read-in-data}}
+\subsubsection{Read in Data}\label{read-in-data}}
 
 Load prey delivery data.
 
@@ -601,7 +600,7 @@ nest age could be confirmed).
 \end{Shaded}
 
 \hypertarget{organize-data}{%
-\subsection{Organize Data}\label{organize-data}}
+\subsubsection{Organize Data}\label{organize-data}}
 
 Data was separated by sex (M vs.~F) and by incubation vs.~nestling
 stage. Nestling period is defined as nest\_age \textgreater{}= 22 days.
@@ -651,7 +650,7 @@ NA earlier when this column was converted to numeric.
 \end{Shaded}
 
 \hypertarget{mean-pd-tables}{%
-\subsection{Mean PD tables}\label{mean-pd-tables}}
+\subsubsection{Mean PD tables}\label{mean-pd-tables}}
 
 Create four stand-alone data.frames, one for M (incubation), one for M
 (nestling), one for F (incubation), and one for F (nestling). These will
@@ -678,7 +677,7 @@ be used for t-tests.
 \end{Shaded}
 
 \hypertarget{calculate-confidence-intervals}{%
-\subsection{Calculate confidence
+\subsubsection{Calculate confidence
 intervals}\label{calculate-confidence-intervals}}
 
 Apply getCI function across data.frames for each sex and stage.
@@ -718,7 +717,7 @@ ciInc because no data is available for MGSA after this time.
 \end{Shaded}
 
 \hypertarget{test-for-difference}{%
-\subsection{Test for Difference}\label{test-for-difference}}
+\subsubsection{Test for Difference}\label{test-for-difference}}
 
 Test for normality for each time interval in M\_inc, M\_nest, and
 F\_nest (excluded pdF\_inc because all values = 0, as female did not
@@ -778,7 +777,7 @@ time interval, for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{any}\NormalTok{(wilcox_inc_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are significantly different: TRUE}
+\KeywordTok{any}\NormalTok{(wilcox_inc_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are sig diff}
 \end{Highlighting}
 \end{Shaded}
 
@@ -788,7 +787,7 @@ time interval, for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{all}\NormalTok{(wilcox_inc_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if all p.values are significantly different: FALSE}
+\KeywordTok{all}\NormalTok{(wilcox_inc_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if all p.values are sig diff}
 \end{Highlighting}
 \end{Shaded}
 
@@ -798,7 +797,7 @@ time interval, for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{filter}\NormalTok{(wilcox_inc_sex, values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#print which rows have p.value that is significantly different}
+\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{filter}\NormalTok{(wilcox_inc_sex, values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#print which rows have sig diff p.value }
 \end{Highlighting}
 \end{Shaded}
 
@@ -850,7 +849,7 @@ time interval, for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{any}\NormalTok{(wilcox_nest_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are significantly different: TRUE}
+\KeywordTok{any}\NormalTok{(wilcox_nest_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are sig diff}
 \end{Highlighting}
 \end{Shaded}
 
@@ -860,7 +859,7 @@ time interval, for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{all}\NormalTok{(wilcox_nest_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if all p.values are significantly different: TRUE}
+\KeywordTok{all}\NormalTok{(wilcox_nest_sex}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if all p.values are sig diff}
 \end{Highlighting}
 \end{Shaded}
 
@@ -875,7 +874,7 @@ rates at time = 2255 and time = 240 are not significantly different
 between males and females.
 
 \hypertarget{plot}{%
-\subsection{Plot}\label{plot}}
+\subsubsection{Plot}\label{plot}}
 
 Incubation (including star indicating non-significant Wilcoxon test at t
 = 225 and t = 240):
@@ -925,10 +924,10 @@ The final plot compares both incubation and nestling stages.
 \begin{figure}
 \centering
 \includegraphics{../manuscript/figures/plot_sex-1.pdf}
-\caption{Figure 2. Mean prey deliveries during the incubation stage
-(top) and nestling stage (bottom). Males are shown in bue and females in
-red. Stars indicate non-significant differences in medians based on
-unpaired two-sample Wilcoxon tests.}
+\caption{Mean prey deliveries during the incubation stage (top) and
+nestling stage (bottom). Males are shown in bue and females in red.
+Stars indicate non-significant differences in medians based on unpaired
+two-sample Wilcoxon tests.}
 \end{figure}
 
 \hypertarget{prey-delivery-rates-by-site}{%
@@ -949,18 +948,15 @@ data for reliable analysis.
 \end{Shaded}
 
 \hypertarget{organize-data-1}{%
-\subsection{Organize Data}\label{organize-data-1}}
+\subsubsection{Organize Data}\label{organize-data-1}}
 
 Data was separated by study site (HFSA vs.~MGSA) and by incubation
-vs.~nestling stage.
+vs.~nestling stage. Since the last observation for HFSA is at time =
+240, we'll end the first data.frame there.
 
-since the last observation for HFSA is at time = 240, we'll end both
-datasets there.
-
-First, create data frame with PDs for whole dataset, then broken down by
-each study site and stage. End incubation data frames at t = 180 and
-nesting data frames at t = 240 because this is the maximum time when
-there is data for both sites.
+Then, create data.frames for each study site and stage. End incubation
+data.frames at t = 180 and nestling data.frames at t = 240 because this
+is the maximum time when there is data for both sites.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1001,7 +997,7 @@ there is data for both sites.
 \end{Shaded}
 
 \hypertarget{mean-pd-tables-1}{%
-\subsection{Mean PD tables}\label{mean-pd-tables-1}}
+\subsubsection{Mean PD tables}\label{mean-pd-tables-1}}
 
 Create four stand-alone data.frames, one for HFSA (incubation), one for
 HFSA (nestling), one for MGSA (incubation), and one for MGSA (nestling).
@@ -1027,7 +1023,7 @@ HFSA (nestling), one for MGSA (incubation), and one for MGSA (nestling).
 \end{Shaded}
 
 \hypertarget{calculate-confidence-intervals-1}{%
-\subsection{Calculate confidence
+\subsubsection{Calculate confidence
 intervals}\label{calculate-confidence-intervals-1}}
 
 Apply getCI across each data.frame, taking each time interval as vector.
@@ -1041,7 +1037,7 @@ Apply getCI across each data.frame, taking each time interval as vector.
 \end{Highlighting}
 \end{Shaded}
 
-Add CIs to a data frame.
+Add CIs to a data.frame.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1065,7 +1061,7 @@ Add CIs to a data frame.
 \end{Shaded}
 
 \hypertarget{test-for-difference-1}{%
-\subsection{Test for Difference}\label{test-for-difference-1}}
+\subsubsection{Test for Difference}\label{test-for-difference-1}}
 
 Test for normality for each time interval in pdMGSA\_inc, pdMGSA\_nest,
 pdHFSA\_inc, and pdHFSA\_nest.
@@ -1121,7 +1117,7 @@ for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{any}\NormalTok{(wilcox_inc_site}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are significantly different: FALSE}
+\KeywordTok{any}\NormalTok{(wilcox_inc_site}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are sig dif}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1131,7 +1127,7 @@ for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{all}\NormalTok{(wilcox_inc_site}\OperatorTok{$}\NormalTok{values }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if all p.values are not significant (double-checking first logical expression's validity): TRUE}
+\KeywordTok{all}\NormalTok{(wilcox_inc_site}\OperatorTok{$}\NormalTok{values }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if all p.values are not significant }
 \end{Highlighting}
 \end{Shaded}
 
@@ -1143,33 +1139,29 @@ for incubation and nestling stages.
 \begin{Highlighting}[]
 \CommentTok{# Nestling Stage}
 \NormalTok{wilcox_nest_site <-}\StringTok{ }\KeywordTok{testWilcox}\NormalTok{(pdMGSA_nest, pdHFSA_nest)}
-\KeywordTok{print}\NormalTok{(wilcox_nest_site)}
+\KeywordTok{print}\NormalTok{(wilcox_inc_site)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##        values ind
-## 1  0.86359650  15
-## 2  0.36770977  30
-## 3  0.39872159  45
-## 4  0.35178594  60
-## 5  0.10780579  75
-## 6  0.68674114  90
-## 7  0.58115165 105
-## 8  0.19753288 120
-## 9  0.56471837 135
-## 10 0.15960487 150
-## 11 0.04904887 165
-## 12 0.86774568 180
-## 13 0.45576212 195
-## 14 0.62367095 210
-## 15 0.45673694 225
-## 16 0.40621178 240
+##       values ind
+## 1  0.9242557  15
+## 2  0.8559074  30
+## 3  0.0509752  45
+## 4  0.3946968  60
+## 5  0.2241870  75
+## 6  0.2673633  90
+## 7  0.6397543 105
+## 8  0.9371807 120
+## 9  0.8637855 135
+## 10 0.1421301 150
+## 11 0.3553358 165
+## 12 0.8206028 180
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{any}\NormalTok{(wilcox_nest_site}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are significantly different: TRUE}
+\KeywordTok{any}\NormalTok{(wilcox_nest_site}\OperatorTok{$}\NormalTok{values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#test if any p.values are sig diff}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1179,7 +1171,7 @@ for incubation and nestling stages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{filter}\NormalTok{(wilcox_nest_site, values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#print which row has p.value that is significantly different}
+\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{filter}\NormalTok{(wilcox_nest_site, values }\OperatorTok{<=}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\CommentTok{#print which row has sig diff p.value}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1194,7 +1186,7 @@ the nestling stage, median prey delivery rates at time = 165 are
 significantly different between MGSA and HFSA.
 
 \hypertarget{plot-1}{%
-\subsection{Plot}\label{plot-1}}
+\subsubsection{Plot}\label{plot-1}}
 
 Mean prey deliveries throughout night in incubation stage:
 
@@ -1243,11 +1235,10 @@ The final plot compares both incubation and nestling stages.
 \begin{figure}
 \centering
 \includegraphics{../manuscript/figures/plot_site-1.pdf}
-\caption{Figure 3. Mean prey deliveries during the incubation stage
-(top) and nestling stage (bottom). Missouri Gulch Study Area (MGSA) is
-shown in bue and Hayman Fire Study Area (HFSA) in red. Stars indicate
-significant differences in medians based on unpaired two-sample Wilcoxon
-tests.}
+\caption{Mean prey deliveries during the incubation stage (top) and
+nestling stage (bottom). Missouri Gulch Study Area (MGSA) is shown in
+bue and Hayman Fire Study Area (HFSA) in red. Stars indicate significant
+differences in medians based on unpaired two-sample Wilcoxon tests.}
 \end{figure}
 
 \hypertarget{discussion}{%

@@ -59,7 +59,7 @@ Travis-CI tests can be found in the tests folder.
 
 ## GNU Make
 
-This compendium contains a makefile that can be used to render the analysis to a PDF or HTML manuscript, stored in the manuscript folder. To re-reder the manuscript, simply type "make manuscript.html" or "make manuscript.pdf" into the bash terminal from the main final-project folder.
+This compendium contains a makefile that can be used to render the analysis to a PDF or HTML manuscript, stored in the manuscript folder. To re-render the manuscript to both PDF and HTML, simply type "make all" into the bash terminal from the main final-project folder. To only render to HTML, you can type "make manuscript.html". To only render to PDF, type "make manuscript.pdf".
 
 
 To render the analysis to a PDF document using GNU make, the latest version of pandoc is recommended and can be downloaded here: https://github.com/jgm/pandoc/releases/tag/2.11.2
